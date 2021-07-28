@@ -3,7 +3,11 @@ body {
 }
 
 .navbar {
-    background-color: #FFB55E;
+    background-color: white;
+    color: #FFB55E;
+}
+
+#homepage{
     color: #FFB55E;
 }
 
