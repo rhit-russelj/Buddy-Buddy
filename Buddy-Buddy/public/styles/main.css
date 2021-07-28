@@ -1,5 +1,5 @@
 body {
-    background: #DDDDDD;
+    background: linear-gradient(180deg, #FFA235 0%, rgba(255, 181, 94, 0.982486) 31.84%, rgba(255, 181, 94, 0.939762) 43.76%, rgba(255, 181, 94, 0.716509) 72.41%, rgba(255, 181, 94, 0.235352) 97.51%, rgba(255, 181, 94, 0) 100%);
 }
 
 .navbar {
@@ -10,3 +10,4 @@ body {
 .page-container {
     margin-top: 75px;
 }
+
