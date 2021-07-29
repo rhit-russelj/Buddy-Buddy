@@ -1,18 +1,43 @@
 body {
     height: 100%;
     background: linear-gradient(180deg, #FFA235 0%, rgba(255, 181, 94, 0.982486) 31.84%, rgba(255, 181, 94, 0.939762) 43.76%, rgba(255, 181, 94, 0.716509) 72.41%, rgba(255, 181, 94, 0.235352) 97.51%, rgba(255, 181, 94, 0) 100%);
+    background-size: cover;
+    background-repeat:no-repeat;
+}
+
+html {
+    height: 100%;
 }
 
 .navbar {
     background-color: white;
     color: #FFB55E;
+    justify-content: center;
+    font-size: 500px;
 }
 
 #homepage{
     color: #FFB55E;
+    font-size: 5%;
+    margin-left: 40%;
+    margin-right: 40%;
 }
 
 .page-container {
     margin-top: 75px;
 }
 
+.homeButtons {
+    background-color: white;
+    width: 200px;
+}
+
+#buttonPage {
+    align-content: center;
+    width: 100%;
+}
+
+#mainPage{
+    width: 100%;
+    max-width: 100% !important;
+}
