@@ -15,7 +15,31 @@ html {
     justify-content: center;
     font-size: 500px;
 }
+#loginHeader {
+    top: 8vh;
+    text-align: center;
+}
 
+#loginHeader a {
+    font-family: 'Lobster', cursive;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 10vw;
+    line-height: 180px;
+}
+
+#mainPage #loginButtonContainer{
+    text-align: center;
+    margin-top: 65vh;
+}
+
+#loginButton {
+    width: 75%;
+    height: 10vw;
+    background-color: white;
+    font-family: 'Raleway', sans-serif;
+    font-size: 3vw;
+}
 #homepage{
     color: #FFB55E;
     font-size: 5%;
