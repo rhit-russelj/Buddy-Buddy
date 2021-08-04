@@ -54,6 +54,8 @@ html {
 .homeButtons {
     background-color: white;
     width: 200px;
+    font-family: Raleway; 
+    font-weight: 700;
 }
 
 #buttonPage {
