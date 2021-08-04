@@ -28,7 +28,7 @@ html {
     line-height: 180px;
 }
 
-#mainPage #loginButtonContainer{
+#loginPage #loginButtonContainer{
     text-align: center;
     margin-top: 65vh;
 }
@@ -40,7 +40,7 @@ html {
     font-family: 'Raleway', sans-serif;
     font-size: 3vw;
 }
-#homepage{
+#homePageLink{
     color: #FFB55E;
     font-size: 5%;
     margin-left: 40%;
@@ -63,7 +63,3 @@ html {
     width: 100%;
 }
 
-#mainPage{
-    width: 100%;
-    max-width: 100% !important;
-}
