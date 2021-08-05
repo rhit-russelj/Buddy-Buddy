@@ -9,26 +9,65 @@
 /** namespace. */
 var rhit = rhit || {};
 
-signIn() {
-Rosefire.signIn("996fd7b5-d122-4361-b84a-4cd23dd7110d", (err, rfUser) => {
-	if (err) {
-	  console.log("Rosefire error!", err);
-	  return;
+rhit.fbAuthManager = null;
+
+rhit.LoginPageController = class {
+	constructor() {
+		document.querySelector("#loginButton").onclick = (event) => {
+			rhit.fbAuthManager.signIn();
+		};
 	}
-	console.log("Rosefire success!", rfUser);
-  
-	// Next use the Rosefire token with Firebase auth.
-	firebase.auth().signInWithCustomToken(rfUser.token).catch((error) => {
-	  if (error.code === 'auth/invalid-custom-token') {
-		console.log("The token you provided is not valid.");
-	  } else {
-		console.log("signInWithCustomToken error", error.message);
-	  }
-	}); // Note: Success should be handled by an onAuthStateChanged listener.
-  });
+}
+
+rhit.FbAuthManager = class {
+	constructor() {
+		this._user = null;
+	}
+
+	beginListening(changeListener) {
+		firebase.auth().onAuthStateChanged((user) => {
+			this._user = user;
+			changeListener();
+		});
+	}
+
+	signIn() {
+		console.log("Sign in using Rosefire");
+		Rosefire.signIn("996fd7b5-d122-4361-b84a-4cd23dd7110d", (err, rfUser) => {
+			if (err) {
+				console.log("Rosefire error!", err);
+				return;
+			}
+			console.log("Rosefire success!", rfUser);
+			firebase.auth().signInWithCustomToken(rfUser.token).catch((error) => {
+				const errorCode = error.code;
+				const errorMessage = error.message;
+				if (errorCode === 'auth/invalid-custom-token') {
+					alert('The token you provided is not valid.');
+				} else {
+					console.error("Custom auth error", errorCode, errorMessage);
+				}
+			});
+		});
+
+	}
+
+	signOut() {
+		firebase.auth().signOut().catch((error) => {
+			console.log("Sign out error");
+		});
+	}
+
+	get isSignedIn() {
+		return !!this._user;
+	}
+
+	get uid() {
+		return this._user.uid;
+	}
 }
   
-rhit.checkForRedirects() = function() {
+rhit.checkForRedirects = function() {
 	if (document.querySelector("#loginPage") && rhit.fbAuthManager.isSignedIn) {
 		window.location.href = "/Homepage.html";
 	}
@@ -37,16 +76,29 @@ rhit.checkForRedirects() = function() {
 	}
 }
 
-rhit.initializeChats() = function() {
+rhit.initializeChats = function() {
 const urlParams = new URLSearchParams(window.location.search);
 
 }
 
-rhit.initializeForums() = function() {
+rhit.initializeForums = function() {
 
+}
+
+rhit.initializePage = function() {
+	if (document.querySelector("#loginPage")) {
+		console.log("You are on the login page.");
+		new rhit.LoginPageController();
+	}
 }
 
 rhit.main = function () {
-
-}
+	console.log("Ready");
+	rhit.fbAuthManager = new rhit.FbAuthManager();
+	rhit.fbAuthManager.beginListening(() => {
+		console.log("isSignedIn = ", rhit.fbAuthManager.isSignedIn);
+		rhit.checkForRedirects();
+		rhit.initializePage();
+	});
+};
 rhit.main();

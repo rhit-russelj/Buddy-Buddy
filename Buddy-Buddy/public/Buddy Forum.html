@@ -16,10 +16,30 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-dark fixed-top">
-    <a id="homepage" class="navbar-brand" href="Homepage.html" style="font-family: Lobster; text-align: center;">Buddy Forum</a>
-  </nav>
-  <div id="mainPage" class="container page-container">
+  <div class="bmd-layout-container bmd-drawer-f-l bmd-drawer-overlay">
+    <header class="bmd-layout-header">
+      <div class="navbar navbar-dark bg-faded fixed-top justify-content-start">
+        <button class="navbar-toggler" type="button" data-toggle="drawer" data-target="#dw-s2">
+          <span class="sr-only">Toggle drawer</span>
+          <i class="material-icons">menu</i>
+        </button>
+        <a id="homePageLink" class="navbar-brand" href="#" style="font-family: Lobster; text-align: center;">Buddy
+          Forum</a>
+      </div>
+    </header>
+    <div id="dw-s2" class="bmd-layout-drawer bg-faded">
+      <header>
+        <a class="navbar-brand" style="font-family: 'Lobster', cursive; font-style: normal;">Buddy Buddy</a>
+      </header>
+      <ul class="list-group">
+        <a id="menuGoToProfilePage" class="list-group-item"><i class="material-icons">account_box</i>My Account</a>
+        <a id="menuGoToProfilePage" class="list-group-item"><i class="material-icons">chat</i>Chat with your Buddies</a>
+        <a id="menuShowAllQuotes" class="list-group-item"><i class="material-icons">forum</i>Buddy Forum</a>
+        <a id="menuShowMyQuotes" class="list-group-item"><i class="material-icons">people</i>Find Buddy</a>
+        <a id="menuSignOut" class="list-group-item"><i class="material-icons">location</i>Find Route</a>
+      </ul>
+    </div>
+  </div>
 
     <!-- Code body here -->
 
@@ -33,6 +53,7 @@
   <script src="/__/firebase/7.18.0/firebase-auth.js"></script>
   <script src="/__/firebase/7.18.0/firebase-firestore.js"></script>
   <script src="/__/firebase/init.js"></script>
+  <script src="scripts/rosefire.js"></script>
   <script src="scripts/main.js"></script>
 </body>
 
