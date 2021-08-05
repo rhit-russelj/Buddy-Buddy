@@ -3,34 +3,50 @@
  * Provides the JavaScript interactions for all pages.
  *
  * @author 
- * PUT_YOUR_NAME_HERE
+ * Sam Stieby and Jessica Russell
  */
 
 /** namespace. */
 var rhit = rhit || {};
 
-/** globals */
-rhit.variableName = "";
-
-/** function and class syntax examples */
-rhit.functionName = function () {
-	/** function body */
-};
-
-rhit.ClassName = class {
-	constructor() {
-
+signIn() {
+Rosefire.signIn("996fd7b5-d122-4361-b84a-4cd23dd7110d", (err, rfUser) => {
+	if (err) {
+	  console.log("Rosefire error!", err);
+	  return;
 	}
-
-	methodName() {
-
+	console.log("Rosefire success!", rfUser);
+  
+	// Next use the Rosefire token with Firebase auth.
+	firebase.auth().signInWithCustomToken(rfUser.token).catch((error) => {
+	  if (error.code === 'auth/invalid-custom-token') {
+		console.log("The token you provided is not valid.");
+	  } else {
+		console.log("signInWithCustomToken error", error.message);
+	  }
+	}); // Note: Success should be handled by an onAuthStateChanged listener.
+  });
+}
+  
+rhit.checkForRedirects() = function() {
+	if (document.querySelector("#loginPage") && rhit.fbAuthManager.isSignedIn) {
+		window.location.href = "/Homepage.html";
+	}
+	if (!document.querySelector("#loginPage") && !rhit.fbAuthManager.isSignedIn) {
+		window.location.href = "/";
 	}
 }
 
-/* Main */
-/** function and class syntax examples */
-rhit.main = function () {
-	console.log("Ready");
-};
+rhit.initializeChats() = function() {
+const urlParams = new URLSearchParams(window.location.search);
 
+}
+
+rhit.initializeForums() = function() {
+
+}
+
+rhit.main = function () {
+
+}
 rhit.main();
