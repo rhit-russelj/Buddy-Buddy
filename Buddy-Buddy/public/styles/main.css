@@ -42,21 +42,21 @@ html {
     font-size: 3vw;
 }
 
+
 #homePageLink {
     color: #FFB55E;
     font-size: 30px;
-    margin-right: 40%;
-}
-
-.page-container {
-    margin-top: 75px;
+    /* margin-right: ; */
 }
 
 .homeButtons {
     background-color: white;
-    width: 200px;
+    margin-top: 20px;
+    width: 65vw;
+    height: 15vh;
     font-family: Raleway; 
     font-weight: 700;
+    font-size: 2.9vh;
 }
 
 #buttonPage {
@@ -82,5 +82,11 @@ html {
 }
 
 #homePage {
-    margin-top: 75px;
+    margin-top: 15vh;
 }
+
+#drawerToggleButton {
+    background-color: #FFB55E; 
+    color: white;
+}
+

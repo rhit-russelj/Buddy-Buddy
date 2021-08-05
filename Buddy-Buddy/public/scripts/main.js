@@ -19,6 +19,24 @@ rhit.LoginPageController = class {
 	}
 }
 
+rhit.HomePageController = class {
+	constructor() {
+		document.querySelector("#findBuddyButton").onclick = (event) => {
+			window.location.href = "/Find Buddy.html"
+		};
+		document.querySelector("#findRouteButton").onclick = (event) => {
+			window.location.href = "/Find Route.html"
+		};
+		document.querySelector("#chatButton").onclick = (event) => {
+			window.location.href = "/Chat.html"
+		};
+		document.querySelector("#forumButton").onclick = (event) => {
+			window.location.href = "/Buddy Forum.html"
+		};
+	}
+}
+
+
 rhit.FbAuthManager = class {
 	constructor() {
 		this._user = null;
@@ -66,29 +84,33 @@ rhit.FbAuthManager = class {
 		return this._user.uid;
 	}
 }
-  
-rhit.checkForRedirects = function() {
-	if (document.querySelector("#loginPage") && rhit.fbAuthManager.isSignedIn) {
-		window.location.href = "/Homepage.html";
-	}
-	if (!document.querySelector("#loginPage") && !rhit.fbAuthManager.isSignedIn) {
-		window.location.href = "/";
-	}
+
+rhit.checkForRedirects = function () {
+	// if (document.querySelector("#loginPage") && rhit.fbAuthManager.isSignedIn) {
+	// 	window.location.href = "/Homepage.html";
+	// }
+	// if (!document.querySelector("#loginPage") && !rhit.fbAuthManager.isSignedIn) {
+	// 	window.location.href = "/";
+	// }
 }
 
-rhit.initializeChats = function() {
-const urlParams = new URLSearchParams(window.location.search);
-
-}
-
-rhit.initializeForums = function() {
+rhit.initializeChats = function () {
+	const urlParams = new URLSearchParams(window.location.search);
 
 }
 
-rhit.initializePage = function() {
+rhit.initializeForums = function () {
+
+}
+
+rhit.initializePage = function () {
 	if (document.querySelector("#loginPage")) {
 		console.log("You are on the login page.");
 		new rhit.LoginPageController();
+	}
+	if (document.querySelector("#homePage")) {
+		console.log("You are on the home page.");
+		new rhit.HomePageController();
 	}
 }
 
