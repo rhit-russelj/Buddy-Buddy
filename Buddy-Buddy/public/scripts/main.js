@@ -21,16 +21,17 @@ rhit.LoginPageController = class {
 
 rhit.HomePageController = class {
 	constructor() {
+		rhit.HandleDrawerButtons();
 		document.querySelector("#findBuddyButton").onclick = (event) => {
 			window.location.href = "/Find Buddy.html"
 		};
 		document.querySelector("#findRouteButton").onclick = (event) => {
 			window.location.href = "/Find Route.html"
 		};
-		document.querySelector("#menuChat").onclick = (event) => {
+		document.querySelector("#chatButton").onclick = (event) => {
 			window.location.href = "/Chat.html"
 		};
-		document.querySelector("#menuForum").onclick = (event) => {
+		document.querySelector("#forumButton").onclick = (event) => {
 			window.location.href = "/Buddy Forum.html"
 		};
 	}
@@ -38,18 +39,7 @@ rhit.HomePageController = class {
 
 rhit.ChatPageController = class {
 	constructor() {
-		document.querySelector("#menuFindBuddy").onclick = (event) => {
-			window.location.href = "/Find Buddy.html"
-		};
-		document.querySelector("#menuFindRoute").onclick = (event) => {
-			window.location.href = "/Find Route.html"
-		};
-		document.querySelector("#menuGoToHomePage").onclick = (event) => {
-			window.location.href = "/Homepage.html"
-		};
-		document.querySelector("#menuForum").onclick = (event) => {
-			window.location.href = "/Buddy Forum.html"
-		};
+		rhit.HandleDrawerButtons();
 	}
 }
 
@@ -133,6 +123,24 @@ rhit.initializePage = function () {
 		console.log("You are on the chat page.");
 		new rhit.ChatPageController();
 	}
+}
+
+rhit.HandleDrawerButtons = function () {
+	document.querySelector("#menuFindBuddy").onclick = (event) => {
+		window.location.href = "/Find Buddy.html"
+	};
+	document.querySelector("#menuFindRoute").onclick = (event) => {
+		window.location.href = "/Find Route.html"
+	};
+	document.querySelector("#menuGoToHomePage").onclick = (event) => {
+		window.location.href = "/Homepage.html"
+	};
+	document.querySelector("#menuForum").onclick = (event) => {
+		window.location.href = "/Buddy Forum.html"
+	};
+	document.querySelector("#menuChat").onclick = (event) => {
+		window.location.href = "/Chat.html"
+	};
 }
 
 rhit.main = function () {
