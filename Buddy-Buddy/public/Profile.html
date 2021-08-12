@@ -19,11 +19,12 @@
   <div class="bmd-layout-container bmd-drawer-f-l bmd-drawer-overlay">
     <header class="bmd-layout-header">
       <div class="navbar navbar-dark bg-faded fixed-top justify-content-start">
-        <button style="background-color: #FFA235;" class="navbar-toggler" type="button" data-toggle="drawer" data-target="#dw-s2">
+        <button id="drawerToggleButton" class="navbar-toggler" type="button" data-toggle="drawer" data-target="#dw-s2">
           <span class="sr-only">Toggle drawer</span>
           <i class="material-icons">menu</i>
         </button>
-        <a id="homePageLink" class="navbar-brand" href="Homepage.html" style="font-family: Lobster; text-align: center; margin-left:25px">Profile</a>
+        <a id="homePageLink" class="navbar-brand" href="Homepage.html"
+          style="font-family: Lobster; text-align: center; margin-left:25px">Profile</a>
       </div>
     </header>
     <div id="dw-s2" class="bmd-layout-drawer bg-faded">
@@ -39,17 +40,18 @@
         <a id="menuForum" class="list-group-item"><i class="material-icons">forum</i>Buddy Forum</a>
       </ul>
     </div>
-  </div>
-   
-    <div class="card" style="width:400px">
-      <img class="card-img-top" src="rose_logo.png" alt="Card image">
-      <div class="card-body">
-        <h4 class="card-title">John Doe</h4>
-        <p class="card-text">Some example text.</p>
+    <main class="bmd-layout-content">
+      <div id="accountPage">
+        <div class="card" style="width:400px">
+          <img class="card-img-top" src="rose_logo.png" alt="Card image">
+          <div class="card-body">
+            <h4 class="card-title">John Doe</h4>
+            <p class="card-text">Some example text.</p>
+          </div>
+        </div>
+        <a type="button" href="#" class="btn btn-primary">Edit Account</a>
       </div>
-    </div>
-    <a type="button" href="#" class="btn btn-primary">Edit Account</a>
-
+    </main>
   </div>
   <script src="scripts/jquery.min.js"></script>
   <script src="scripts/popper.js"></script>

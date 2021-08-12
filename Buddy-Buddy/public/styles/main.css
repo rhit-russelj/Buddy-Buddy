@@ -81,7 +81,7 @@ html {
     cursor: pointer;
 }
 
-#homePage {
+#homePage, #accountPage, #chatPage, #forumPage, #findBuddyPage, #findRoutePage {
     margin-top: 15vh;
 }
 
