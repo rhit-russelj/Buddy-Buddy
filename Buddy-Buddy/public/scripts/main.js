@@ -42,6 +42,26 @@ rhit.ChatPageController = class {
 		rhit.HandleDrawerButtons();
 	}
 }
+rhit.ForumPageController = class {
+	constructor() {
+		rhit.HandleDrawerButtons();
+	}
+}
+rhit.FindBuddyPageController = class {
+	constructor() {
+		rhit.HandleDrawerButtons();
+	}
+}
+rhit.FindRoutePageController = class {
+	constructor() {
+		rhit.HandleDrawerButtons();
+	}
+}
+rhit.AccountPageController = class {
+	constructor() {
+		rhit.HandleDrawerButtons();
+	}
+}
 
 
 rhit.FbAuthManager = class {
@@ -123,24 +143,43 @@ rhit.initializePage = function () {
 		console.log("You are on the chat page.");
 		new rhit.ChatPageController();
 	}
+	if (document.querySelector("#forumPage")) {
+		console.log("You are on the forum page.");
+		new rhit.ForumPageController();
+	}
+	if (document.querySelector("#accountPage")) {
+		console.log("You are on the profile page.");
+		new rhit.AccountPageController();
+	}
+	if (document.querySelector("#findRoutePage")) {
+		console.log("You are on the find route page.");
+		new rhit.FindRoutePageController();
+	}
+	if (document.querySelector("#findBuddyPage")) {
+		console.log("You are on the find buddy page.");
+		new rhit.FindBuddyPageController();
+	}
 }
 
 rhit.HandleDrawerButtons = function () {
 	document.querySelector("#menuFindBuddy").onclick = (event) => {
-		window.location.href = "/Find Buddy.html"
+		window.location.href = "/Find Buddy.html";
 	};
 	document.querySelector("#menuFindRoute").onclick = (event) => {
-		window.location.href = "/Find Route.html"
+		window.location.href = "/Find Route.html";
 	};
 	document.querySelector("#menuGoToHomePage").onclick = (event) => {
-		window.location.href = "/Homepage.html"
+		window.location.href = "/Homepage.html";
 	};
 	document.querySelector("#menuForum").onclick = (event) => {
-		window.location.href = "/Buddy Forum.html"
+		window.location.href = "/Buddy Forum.html";
 	};
 	document.querySelector("#menuChat").onclick = (event) => {
-		window.location.href = "/Chat.html"
+		window.location.href = "/Chat.html";
 	};
+	document.querySelector("#menuGoToProfilePage").onclick = (event) => {
+		window.location.href = "/Profile.html";
+	}
 }
 
 rhit.main = function () {
