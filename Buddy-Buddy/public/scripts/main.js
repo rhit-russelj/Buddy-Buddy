@@ -27,10 +27,27 @@ rhit.HomePageController = class {
 		document.querySelector("#findRouteButton").onclick = (event) => {
 			window.location.href = "/Find Route.html"
 		};
-		document.querySelector("#chatButton").onclick = (event) => {
+		document.querySelector("#menuChat").onclick = (event) => {
 			window.location.href = "/Chat.html"
 		};
-		document.querySelector("#forumButton").onclick = (event) => {
+		document.querySelector("#menuForum").onclick = (event) => {
+			window.location.href = "/Buddy Forum.html"
+		};
+	}
+}
+
+rhit.ChatPageController = class {
+	constructor() {
+		document.querySelector("#menuFindBuddy").onclick = (event) => {
+			window.location.href = "/Find Buddy.html"
+		};
+		document.querySelector("#menuFindRoute").onclick = (event) => {
+			window.location.href = "/Find Route.html"
+		};
+		document.querySelector("#menuGoToHomePage").onclick = (event) => {
+			window.location.href = "/Homepage.html"
+		};
+		document.querySelector("#menuForum").onclick = (event) => {
 			window.location.href = "/Buddy Forum.html"
 		};
 	}
@@ -111,6 +128,10 @@ rhit.initializePage = function () {
 	if (document.querySelector("#homePage")) {
 		console.log("You are on the home page.");
 		new rhit.HomePageController();
+	}
+	if (document.querySelector("#chatPage")) {
+		console.log("You are on the chat page.");
+		new rhit.ChatPageController();
 	}
 }
 
