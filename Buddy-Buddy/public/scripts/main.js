@@ -8,8 +8,24 @@
 
 /** namespace. */
 var rhit = rhit || {};
+rhit.FB_CHATS_COLLECTION = "Chats";
+rhit.FB_KEY_MESSAGE = "message";
+rhit.FB_KEY_TIMESTAMP = "timeSent";
+rhit.FB_FORUM_COLLECTION = "Forum";
+rhit.FB_USERS_COLLECTION = "Users";
+
 
 rhit.fbAuthManager = null;
+rhit.fbUsersManager = null;
+rhit.fbChatsManager = null;
+
+// From https://stackoverflow.com/questions/494143/creating-a-new-dom-element-from-an-html-string-using-built-in-dom-methods-or-pro
+function htmlToElement(html) {
+	var template = document.createElement('template');
+	html = html.trim();
+	template.innerHTML = html;
+	return template.content.firstChild;
+}
 
 rhit.LoginPageController = class {
 	constructor() {
@@ -18,7 +34,6 @@ rhit.LoginPageController = class {
 		};
 	}
 }
-
 rhit.HomePageController = class {
 	constructor() {
 		rhit.HandleDrawerButtons();
@@ -36,11 +51,41 @@ rhit.HomePageController = class {
 		};
 	}
 }
-
 rhit.ChatPageController = class {
 	constructor() {
 		rhit.HandleDrawerButtons();
+		// rhit.fbChatsManager.beginListening(this.updateList.bind(this));
 	}
+
+	_createCard(buddy) {
+		return htmlToElement(`      
+	<div class="card">
+		<div class="card-body">
+		  <h5 class="card-title">${buddy.name}</h5>
+		</div>
+	</div>`);
+	}
+
+	updateBuddies() {
+		const newBuddyList = htmlToElement('<div id="buddyListContainer"></div>');
+		for (let i = 0; i < rhit.fbChatsManager.length; i++) {
+			const chat = rhit.fbChatsManager.getChatAtIndex(i);
+			const newCard = this._createCard(buddy);
+			const chatUrlParam = `${buddy.uid}` + `${user.uid}`;
+			newCard.onclick = (event) => {
+				window.location.href = `/Single Chat.html?id=${chatUrlParam}`;
+			}
+		}
+	}
+
+}
+rhit.SingleChatController = class {
+	constructor() {
+		HandleDrawerButtons();
+	}
+}
+rhit.FbChatsManager = class {
+
 }
 rhit.ForumPageController = class {
 	constructor() {
@@ -62,8 +107,6 @@ rhit.AccountPageController = class {
 		rhit.HandleDrawerButtons();
 	}
 }
-
-
 rhit.FbAuthManager = class {
 	constructor() {
 		this._user = null;
@@ -93,6 +136,9 @@ rhit.FbAuthManager = class {
 					console.error("Custom auth error", errorCode, errorMessage);
 				}
 			});
+			let name = rfUser.name;
+			let email = rfUser.email;
+			let uid = rfUser.username;
 		});
 
 	}
@@ -120,16 +166,6 @@ rhit.checkForRedirects = function () {
 		window.location.href = "/";
 	}
 }
-
-rhit.initializeChats = function () {
-	const urlParams = new URLSearchParams(window.location.search);
-
-}
-
-rhit.initializeForums = function () {
-
-}
-
 rhit.initializePage = function () {
 	if (document.querySelector("#loginPage")) {
 		console.log("You are on the login page.");
@@ -142,6 +178,7 @@ rhit.initializePage = function () {
 	if (document.querySelector("#chatPage")) {
 		console.log("You are on the chat page.");
 		new rhit.ChatPageController();
+		rhit.fbChatsManager = new rhit.FbChatsManager(uid);
 	}
 	if (document.querySelector("#forumPage")) {
 		console.log("You are on the forum page.");
@@ -160,7 +197,6 @@ rhit.initializePage = function () {
 		new rhit.FindBuddyPageController();
 	}
 }
-
 rhit.HandleDrawerButtons = function () {
 	document.querySelector("#menuFindBuddy").onclick = (event) => {
 		window.location.href = "/Find Buddy.html";
@@ -180,8 +216,11 @@ rhit.HandleDrawerButtons = function () {
 	document.querySelector("#menuGoToProfilePage").onclick = (event) => {
 		window.location.href = "/Profile.html";
 	}
+	document.querySelector("#menuSignOut").onclick = (event) => {
+		rhit.fbAuthManager.signOut();
+		window.location.href = "/index.html";
+	}
 }
-
 rhit.main = function () {
 	console.log("Ready");
 	rhit.fbAuthManager = new rhit.FbAuthManager();
