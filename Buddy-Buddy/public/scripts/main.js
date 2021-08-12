@@ -78,7 +78,7 @@ rhit.FbAuthManager = class {
 
 	signIn() {
 		console.log("Sign in using Rosefire");
-		Rosefire.signIn("996fd7b5-d122-4361-b84a-4cd23dd7110d", (err, rfUser) => {
+		Rosefire.signIn("e9c3d9c1-a6b8-4f20-901b-dc72d13b3b1e", (err, rfUser) => {
 			if (err) {
 				console.log("Rosefire error!", err);
 				return;
@@ -113,12 +113,12 @@ rhit.FbAuthManager = class {
 }
 
 rhit.checkForRedirects = function () {
-	// if (document.querySelector("#loginPage") && rhit.fbAuthManager.isSignedIn) {
-	// 	window.location.href = "/Homepage.html";
-	// }
-	// if (!document.querySelector("#loginPage") && !rhit.fbAuthManager.isSignedIn) {
-	// 	window.location.href = "/";
-	// }
+	if (document.querySelector("#loginPage") && rhit.fbAuthManager.isSignedIn) {
+		window.location.href = "/Homepage.html";
+	}
+	if (!document.querySelector("#loginPage") && !rhit.fbAuthManager.isSignedIn) {
+		window.location.href = "/";
+	}
 }
 
 rhit.initializeChats = function () {
