@@ -10,7 +10,8 @@
 var rhit = rhit || {};
 rhit.FB_CHATS_COLLECTION = "Chats";
 rhit.FB_KEY_MESSAGE = "message";
-rhit.FB_KEY_TIMESTAMP = "timeSent";
+rhit.FB_KEY_SENDER = "sender";
+rhit.FB_KEY_TIMESTAMP = "lastTouched";
 rhit.FB_FORUM_COLLECTION = "Forum";
 rhit.FB_USERS_COLLECTION = "Users";
 
@@ -39,83 +40,83 @@ rhit.LoginPageController = class {
 
 function initMap() {
 	var map = new google.maps.Map(document.getElementById('map'), {
-	  zoom: 8,
-	  center: {
-		lat: -34.397,
-		lng: 150.644
-	  }
+		zoom: 8,
+		center: {
+			lat: -34.397,
+			lng: 150.644
+		}
 	});
-  
+
 	var directionsService = new google.maps.DirectionsService();
-  
+
 	var directionsDisplay = new google.maps.DirectionsRenderer({
-	  map: map
-	});
-  
-	var geocoder = new google.maps.Geocoder();
-  
-	var pointA, pointB;
-  
-  
-	geocoder.geocode({
-	  'address': document.getElementById('addressFrom').value
-	}, function(results, status) {
-	  if (status != "OK") return;
-	  var location = results[0].geometry.location;
-	  pointA = new google.maps.LatLng(location.lat(), location.lng());
-	  alert(location.lat() + ',' + location.lng());
-	  var markerA = new google.maps.Marker({
-		position: pointA,
-		title: "point A",
-		label: "A",
 		map: map
-	  });
-	  geocoder.geocode({
-		'address': document.getElementById('addressTo').value
-	  }, function(results, status) {
+	});
+
+	var geocoder = new google.maps.Geocoder();
+
+	var pointA, pointB;
+
+
+	geocoder.geocode({
+		'address': document.getElementById('addressFrom').value
+	}, function (results, status) {
 		if (status != "OK") return;
 		var location = results[0].geometry.location;
-		pointB = new google.maps.LatLng(location.lat(), location.lng());
+		pointA = new google.maps.LatLng(location.lat(), location.lng());
 		alert(location.lat() + ',' + location.lng());
-		var markerB = new google.maps.Marker({
-		  position: pointB,
-		  title: "point B",
-		  label: "B",
-		  map: map
+		var markerA = new google.maps.Marker({
+			position: pointA,
+			title: "point A",
+			label: "A",
+			map: map
 		});
-		calculateAndDisplayRoute(directionsService, directionsDisplay, pointA, pointB);
-	  });
+		geocoder.geocode({
+			'address': document.getElementById('addressTo').value
+		}, function (results, status) {
+			if (status != "OK") return;
+			var location = results[0].geometry.location;
+			pointB = new google.maps.LatLng(location.lat(), location.lng());
+			alert(location.lat() + ',' + location.lng());
+			var markerB = new google.maps.Marker({
+				position: pointB,
+				title: "point B",
+				label: "B",
+				map: map
+			});
+			calculateAndDisplayRoute(directionsService, directionsDisplay, pointA, pointB);
+		});
 	});
-  }
-  
-  function calculateAndDisplayRoute(directionsService, directionsDisplay, pointA, pointB) {
+}
+
+function calculateAndDisplayRoute(directionsService, directionsDisplay, pointA, pointB) {
 	directionsService.route({
-	  origin: pointA,
-	  destination: pointB,
-	  travelMode: google.maps.TravelMode.WALKING
-	}, function(response, status) {
-	  if (status == google.maps.DirectionsStatus.OK) {
-		directionsDisplay.setDirections(response);
-	  } else {
-		window.alert('Directions request failed due to ' + status);
-	  }
+		origin: pointA,
+		destination: pointB,
+		travelMode: google.maps.TravelMode.WALKING
+	}, function (response, status) {
+		if (status == google.maps.DirectionsStatus.OK) {
+			directionsDisplay.setDirections(response);
+		} else {
+			window.alert('Directions request failed due to ' + status);
+		}
 	});
-  }
+}
 
 rhit.HomePageController = class {
 	constructor() {
 		rhit.HandleDrawerButtons();
 		document.querySelector("#findBuddyButton").onclick = (event) => {
-			window.location.href = "/Find Buddy.html"
+			window.location.href = "/Find Buddy.html";
 		};
 		document.querySelector("#findRouteButton").onclick = (event) => {
-			window.location.href = "/Find Route.html"
+			window.location.href = "/Find Route.html";
 		};
 		document.querySelector("#chatButton").onclick = (event) => {
-			window.location.href = "/Chat.html"
+			window.location.href = `/Chat.html?uid=${rhit.fbAuthManager.uid}`;
 		};
 		document.querySelector("#forumButton").onclick = (event) => {
-			window.location.href = "/Buddy Forum.html"
+			window.location.href = "/Buddy Forum.html";
 		};
 	}
 }
@@ -129,7 +130,7 @@ rhit.ChatPageController = class {
 		return htmlToElement(`      
 	<div class="card">
 		<div class="card-body">
-		  <h5 class="card-title">${buddy.name}</h5>
+		  <h5 class="card-title">${buddy}</h5>
 		</div>
 	</div>`);
 	}
@@ -138,8 +139,8 @@ rhit.ChatPageController = class {
 		const newBuddyList = htmlToElement('<div id="buddyListContainer"></div>');
 		for (let i = 0; i < rhit.fbChatsManager.length; i++) {
 			const chat = rhit.fbChatsManager.getChatAtIndex(i);
-			const newCard = this._createCard(buddy);
-			const chatUrlParam = `${buddy.uid}` + `${user.uid}`;
+			const newCard = this._createCard(chat.name);
+			const chatUrlParam = `${chat.uid}` + `${this._uid}`;
 			newCard.onclick = (event) => {
 				window.location.href = `/Single Chat.html?id=${chatUrlParam}`;
 			}
@@ -153,7 +154,19 @@ rhit.SingleChatController = class {
 	}
 }
 rhit.FbChatsManager = class {
-
+	constructor(uid) {
+		this._uid = uid;
+		this._documentSnapshot = {};
+		this._unsubscribe = null;
+		this._ref = firebase.firestore().collection(rhit.FB_CHATS_COLLECTION).doc("stiebysdfisherds");
+	}
+	beginListening(changeListener) {
+		// let query = this._ref.where(rhit.FB_KEY_SENDER, "==", this._uid);
+		this._unsubscribe = this._ref.onSnapshot((doc) => {
+			this._documentSnapshot = doc;
+			changeListener();
+		})
+	}
 }
 rhit.ForumPageController = class {
 	constructor() {
@@ -235,6 +248,7 @@ rhit.checkForRedirects = function () {
 	}
 }
 rhit.initializePage = function () {
+	const urlParams = new URLSearchParams(window.location.search);
 	if (document.querySelector("#loginPage")) {
 		console.log("You are on the login page.");
 		new rhit.LoginPageController();
@@ -245,8 +259,9 @@ rhit.initializePage = function () {
 	}
 	if (document.querySelector("#chatPage")) {
 		console.log("You are on the chat page.");
-		new rhit.ChatPageController();
+		const uid = urlParams.get("uid");
 		rhit.fbChatsManager = new rhit.FbChatsManager(uid);
+		new rhit.ChatPageController();
 	}
 	if (document.querySelector("#forumPage")) {
 		console.log("You are on the forum page.");
@@ -279,7 +294,7 @@ rhit.HandleDrawerButtons = function () {
 		window.location.href = "/Buddy Forum.html";
 	};
 	document.querySelector("#menuChat").onclick = (event) => {
-		window.location.href = "/Chat.html";
+		window.location.href = `/Chat.html?uid=${rhit.fbAuthManager.uid}`;
 	};
 	document.querySelector("#menuGoToProfilePage").onclick = (event) => {
 		window.location.href = "/Profile.html";
