@@ -100,31 +100,32 @@ html {
     /* The width is the width of the web page */
   }
   
-  #accountPage, #accountPage * {
-    justify-content: center;
-    align-items: center;
+#accountPage, #accountPage * {
     text-align: center;
-    align-content: center;
     font-family: 'Raleway', sans-serif;
-  }
+}
 
-  #accountPage .card-img-top, .card{
-    max-width: 35vw;
-  }
+#accountPage .card-img-top, .card{
+max-width: 35vw;
+}
 
-  #accountPage .card-title {
-      font-size: 3vw;
-  }
-  #accountPage .card-text {
-      font-size: 2vw;
-  }
+#accountPage .card-title {
+    font-size: 3vw;
+}
 
-  #editAccountButton {
-      font-size: 2vw;
-      color: black;
-      background-color: white;
-      margin-top: .5em;
-      /* text-align: center; */
-      width: 26vw;
-      height: 5vw;
-  }
+#accountPage .card-text {
+    font-size: 2vw;
+}
+
+#editAccountButton {
+    font-size: 2vw;
+    color: black;
+    background-color: white;
+    margin-top: .5em;
+    width: 26vw;
+    height: 5vw;
+}
+
+.card-author {
+    text-align: right;
+}
