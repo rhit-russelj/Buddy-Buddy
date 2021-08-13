@@ -124,6 +124,12 @@ rhit.ChatPageController = class {
 	constructor() {
 		rhit.HandleDrawerButtons();
 		// rhit.fbChatsManager.beginListening(this.updateList.bind(this));
+		document.querySelector("#exampleBuddy").addEventListener("click", (event) => {
+			const sender = document.querySelector("#sender").value;
+			const message = document.querySelector("#message").value;
+			rhit.fbChatsManager.add(sender, message);
+		});
+		
 	}
 
 	_createCard(buddy) {
@@ -139,27 +145,54 @@ rhit.ChatPageController = class {
 		const newBuddyList = htmlToElement('<div id="buddyListContainer"></div>');
 		for (let i = 0; i < rhit.fbChatsManager.length; i++) {
 			const chat = rhit.fbChatsManager.getChatAtIndex(i);
-			const newCard = this._createCard(chat.name);
+			const newCard = this._createCard(chat);
 			const chatUrlParam = `${chat.uid}` + `${this._uid}`;
 			newCard.onclick = (event) => {
 				window.location.href = `/Single Chat.html?id=${chatUrlParam}`;
-			}
+			};
+			newBuddyList.appendChild(newCard);
 		}
+
+		const oldList = document.querySelector("#buddyListContainer");
+		oldList.removeAttribute("uid");
+		oldList.hidden = true;
+
+		oldList.parentElement.appendChild(newBuddyList);
 	}
 
 }
 rhit.SingleChatController = class {
-	constructor() {
+	constructor(id, sender, message) {
+		this.id = id;
+		this.sender = sender;
+		this.message = message;
 		HandleDrawerButtons();
 	}
 }
 rhit.FbChatsManager = class {
 	constructor(uid) {
 		this._uid = uid;
-		this._documentSnapshot = {};
+		this._documentSnapshot = [];
 		this._unsubscribe = null;
-		this._ref = firebase.firestore().collection(rhit.FB_CHATS_COLLECTION).doc("stiebysdfisherds");
+		this._ref = firebase.firestore().collection(rhit.FB_CHATS_COLLECTION);
 	}
+
+	add(sender, message) {
+
+		this._ref.add({
+			[rhit.FB_KEY_SENDER]: sender,
+			[rhit.FB_KEY_MESSAGE]: message,
+			[rhit.FB_KEY_LAST_TOUCHED]: firebase.firestore.Timestamp.now(),
+		})
+			.then(function (docRef) {
+				console.log("Document written with ID: ", docRef.id);
+			})
+			.catch(function (error) {
+				console.error("Error adding document: ", error);
+			});
+
+	}
+
 	beginListening(changeListener) {
 		// let query = this._ref.where(rhit.FB_KEY_SENDER, "==", this._uid);
 		this._unsubscribe = this._ref.onSnapshot((doc) => {
@@ -167,6 +200,26 @@ rhit.FbChatsManager = class {
 			changeListener();
 		})
 	}
+
+	stopListening() {
+		this._unsubscribe();
+	}
+	// update(id, quote, movie) {    }
+	// delete(id) { }
+	get length() {
+		return this._documentSnapshots.length;
+	}
+
+	getChatAtIndex(index) {
+		const docSnapshot = this._documentSnapshots[index];
+		const chat = new rhit.MovieQuote(
+			docSnapshot.id,
+			docSnapshot.get(rhit.FB_KEY_MESSAGE),
+			docSnapshot.get(rhit.FB_KEY_SENDER)
+		);
+		return chat;
+	}
+	
 }
 rhit.ForumPageController = class {
 	constructor() {
