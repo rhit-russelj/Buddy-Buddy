@@ -46,7 +46,6 @@ html {
 #homePageLink {
     color: #FFB55E;
     font-size: 30px;
-    /* margin-right: ; */
 }
 
 .homeButtons {
@@ -60,7 +59,6 @@ html {
 }
 
 #buttonPage {
-    align-content: center;
     width: 100%;
 }
 
@@ -102,3 +100,21 @@ html {
     /* The width is the width of the web page */
   }
   
+  #accountPage, #accountPage * {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    align-content: center;
+    font-family: 'Raleway', sans-serif;
+  }
+
+  #accountPage .card-img-top, .card{
+    max-width: 400px;
+  }
+
+  #editAccountButton {
+      font-size: 2.9vh;
+      color: black;
+      background-color: white;
+      margin-top: .5em;
+  }
