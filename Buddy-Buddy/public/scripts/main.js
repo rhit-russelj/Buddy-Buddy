@@ -92,29 +92,12 @@ function initMap() {
 	directionsService.route({
 	  origin: pointA,
 	  destination: pointB,
-	  travelMode: google.maps.TravelMode.DRIVING
+	  travelMode: google.maps.TravelMode.WALKING
 	}, function(response, status) {
 	  if (status == google.maps.DirectionsStatus.OK) {
 		directionsDisplay.setDirections(response);
 	  } else {
 		window.alert('Directions request failed due to ' + status);
-	  }
-	});
-  }
-  
-  function calcRoute(haight, oceanBeach, directionsService, directionsRenderer) {
-	var selectedMode = "WALKING";
-	var request = {
-		origin: haight,
-		destination: oceanBeach,
-		// Note that JavaScript allows us to access the constant
-		// using square brackets and a string value as its
-		// "property."
-		travelMode: google.maps.TravelMode[selectedMode]
-	};
-	directionsService.route(request, function(response, status) {
-	  if (status == 'OK') {
-		directionsRenderer.setDirections(response);
 	  }
 	});
   }
