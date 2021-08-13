@@ -19,6 +19,37 @@ rhit.LoginPageController = class {
 	}
 }
 
+function initMap() {
+	var directionsService = new google.maps.DirectionsService();
+	var directionsRenderer = new google.maps.DirectionsRenderer();
+	var haight = new google.maps.LatLng(37.7699298, -122.4469157);
+	var oceanBeach = new google.maps.LatLng(37.7683909618184, -122.51089453697205);
+	var mapOptions = {
+	  zoom: 14,
+	  center: "Terre Haute"
+	}
+	var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+	directionsRenderer.setMap(map);
+	calcRoute(haight, oceanBeach, directionsService, directionsRenderer);
+  }
+  
+  function calcRoute(haight, oceanBeach, directionsService, directionsRenderer) {
+	var selectedMode = "WALKING";
+	var request = {
+		origin: 'Terre Haute',
+		destination: 'Brazil',
+		// Note that JavaScript allows us to access the constant
+		// using square brackets and a string value as its
+		// "property."
+		travelMode: google.maps.TravelMode[selectedMode]
+	};
+	directionsService.route(request, function(response, status) {
+	  if (status == 'OK') {
+		directionsRenderer.setDirections(response);
+	  }
+	});
+  }
+
 rhit.HomePageController = class {
 	constructor() {
 		rhit.HandleDrawerButtons();
@@ -184,6 +215,7 @@ rhit.HandleDrawerButtons = function () {
 
 rhit.main = function () {
 	console.log("Ready");
+	initMap();
 	rhit.fbAuthManager = new rhit.FbAuthManager();
 	rhit.fbAuthManager.beginListening(() => {
 		console.log("isSignedIn = ", rhit.fbAuthManager.isSignedIn);
