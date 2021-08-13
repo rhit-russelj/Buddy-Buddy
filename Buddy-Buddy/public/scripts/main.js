@@ -14,6 +14,8 @@ rhit.FB_KEY_TIMESTAMP = "timeSent";
 rhit.FB_FORUM_COLLECTION = "Forum";
 rhit.FB_USERS_COLLECTION = "Users";
 
+let map;
+
 
 rhit.fbAuthManager = null;
 rhit.fbUsersManager = null;
@@ -36,24 +38,75 @@ rhit.LoginPageController = class {
 }
 
 function initMap() {
+	var map = new google.maps.Map(document.getElementById('map'), {
+	  zoom: 8,
+	  center: {
+		lat: -34.397,
+		lng: 150.644
+	  }
+	});
+  
 	var directionsService = new google.maps.DirectionsService();
-	var directionsRenderer = new google.maps.DirectionsRenderer();
-	var haight = new google.maps.LatLng(37.7699298, -122.4469157);
-	var oceanBeach = new google.maps.LatLng(37.7683909618184, -122.51089453697205);
-	var mapOptions = {
-	  zoom: 14,
-	  center: "Terre Haute"
-	}
-	var map = new google.maps.Map(document.getElementById('map'), mapOptions);
-	directionsRenderer.setMap(map);
-	calcRoute(haight, oceanBeach, directionsService, directionsRenderer);
+  
+	var directionsDisplay = new google.maps.DirectionsRenderer({
+	  map: map
+	});
+  
+	var geocoder = new google.maps.Geocoder();
+  
+	var pointA, pointB;
+  
+  
+	geocoder.geocode({
+	  'address': document.getElementById('addressFrom').value
+	}, function(results, status) {
+	  if (status != "OK") return;
+	  var location = results[0].geometry.location;
+	  pointA = new google.maps.LatLng(location.lat(), location.lng());
+	  alert(location.lat() + ',' + location.lng());
+	  var markerA = new google.maps.Marker({
+		position: pointA,
+		title: "point A",
+		label: "A",
+		map: map
+	  });
+	  geocoder.geocode({
+		'address': document.getElementById('addressTo').value
+	  }, function(results, status) {
+		if (status != "OK") return;
+		var location = results[0].geometry.location;
+		pointB = new google.maps.LatLng(location.lat(), location.lng());
+		alert(location.lat() + ',' + location.lng());
+		var markerB = new google.maps.Marker({
+		  position: pointB,
+		  title: "point B",
+		  label: "B",
+		  map: map
+		});
+		calculateAndDisplayRoute(directionsService, directionsDisplay, pointA, pointB);
+	  });
+	});
+  }
+  
+  function calculateAndDisplayRoute(directionsService, directionsDisplay, pointA, pointB) {
+	directionsService.route({
+	  origin: pointA,
+	  destination: pointB,
+	  travelMode: google.maps.TravelMode.DRIVING
+	}, function(response, status) {
+	  if (status == google.maps.DirectionsStatus.OK) {
+		directionsDisplay.setDirections(response);
+	  } else {
+		window.alert('Directions request failed due to ' + status);
+	  }
+	});
   }
   
   function calcRoute(haight, oceanBeach, directionsService, directionsRenderer) {
 	var selectedMode = "WALKING";
 	var request = {
-		origin: 'Terre Haute',
-		destination: 'Brazil',
+		origin: haight,
+		destination: oceanBeach,
 		// Note that JavaScript allows us to access the constant
 		// using square brackets and a string value as its
 		// "property."
@@ -255,7 +308,7 @@ rhit.HandleDrawerButtons = function () {
 }
 rhit.main = function () {
 	console.log("Ready");
-	initMap();
+	// initMap();
 	rhit.fbAuthManager = new rhit.FbAuthManager();
 	rhit.fbAuthManager.beginListening(() => {
 		console.log("isSignedIn = ", rhit.fbAuthManager.isSignedIn);
