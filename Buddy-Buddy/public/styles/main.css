@@ -79,7 +79,7 @@ html {
     cursor: pointer;
 }
 
-#homePage, #accountPage, #chatPage, #forumPage, #findBuddyPage, #findRoutePage {
+#homePage, #accountPage, #chatPage, #forumPage, #findBuddyPage {
     margin-top: 13vh;
 }
 
@@ -128,4 +128,17 @@ max-width: 35vw;
 
 .card-author {
     text-align: right;
+}
+
+#map {
+    background-color: white;
+}
+
+#addressFrom, #addressTo, #submit  {
+    margin-top: 15px;
+    text-align: center;
+}
+
+#findRoutePage {
+    text-align: center;
 }

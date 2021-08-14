@@ -38,57 +38,6 @@ rhit.LoginPageController = class {
 	}
 }
 
-function initMap() {
-	var map = new google.maps.Map(document.getElementById('map'), {
-		zoom: 8,
-		center: {
-			lat: -34.397,
-			lng: 150.644
-		}
-	});
-
-	var directionsService = new google.maps.DirectionsService();
-
-	var directionsDisplay = new google.maps.DirectionsRenderer({
-		map: map
-	});
-
-	var geocoder = new google.maps.Geocoder();
-
-	var pointA, pointB;
-
-
-	geocoder.geocode({
-		'address': document.getElementById('addressFrom').value
-	}, function (results, status) {
-		if (status != "OK") return;
-		var location = results[0].geometry.location;
-		pointA = new google.maps.LatLng(location.lat(), location.lng());
-		alert(location.lat() + ',' + location.lng());
-		var markerA = new google.maps.Marker({
-			position: pointA,
-			title: "point A",
-			label: "A",
-			map: map
-		});
-		geocoder.geocode({
-			'address': document.getElementById('addressTo').value
-		}, function (results, status) {
-			if (status != "OK") return;
-			var location = results[0].geometry.location;
-			pointB = new google.maps.LatLng(location.lat(), location.lng());
-			alert(location.lat() + ',' + location.lng());
-			var markerB = new google.maps.Marker({
-				position: pointB,
-				title: "point B",
-				label: "B",
-				map: map
-			});
-			calculateAndDisplayRoute(directionsService, directionsDisplay, pointA, pointB);
-		});
-	});
-}
-
 function calculateAndDisplayRoute(directionsService, directionsDisplay, pointA, pointB) {
 	directionsService.route({
 		origin: pointA,
@@ -129,7 +78,7 @@ rhit.ChatPageController = class {
 			const message = document.querySelector("#message").value;
 			rhit.fbChatsManager.add(sender, message);
 		});
-		
+
 	}
 
 	_createCard(buddy) {
@@ -219,7 +168,7 @@ rhit.FbChatsManager = class {
 		);
 		return chat;
 	}
-	
+
 }
 rhit.ForumPageController = class {
 	constructor() {
@@ -234,7 +183,64 @@ rhit.FindBuddyPageController = class {
 rhit.FindRoutePageController = class {
 	constructor() {
 		rhit.HandleDrawerButtons();
+		this.initMap();
+		document.querySelector("#submit").onclick = (event) => {
+			let A = document.querySelector("#addressFrom").value;
+			let B = document.querySelector("#addressTo").value;
+			this.initMap(A, B);			
+		}
 	}
+
+	initMap(pointA, pointB) {
+		var map = new google.maps.Map(document.getElementById('map'), {
+			zoom: 8,
+			center: {
+				lat: -34.397,
+				lng: 150.644
+			}
+		});
+
+		var directionsService = new google.maps.DirectionsService();
+
+		var directionsDisplay = new google.maps.DirectionsRenderer({
+			map: map
+		});
+		var geocoder = new google.maps.Geocoder();
+
+		// var pointA, pointB;
+
+
+		geocoder.geocode({
+			'address': document.getElementById('addressFrom').value
+		}, function (results, status) {
+			if (status != "OK") return;
+			var location = results[0].geometry.location;
+			pointA = new google.maps.LatLng(location.lat(), location.lng());
+			// alert(location.lat() + ',' + location.lng());
+			var markerA = new google.maps.Marker({
+				position: pointA,
+				title: "point A",
+				label: "A",
+				map: map
+			});
+			geocoder.geocode({
+				'address': document.getElementById('addressTo').value
+			}, function (results, status) {
+				if (status != "OK") return;
+				var location = results[0].geometry.location;
+				pointB = new google.maps.LatLng(location.lat(), location.lng());
+				// alert(location.lat() + ',' + location.lng());
+				var markerB = new google.maps.Marker({
+					position: pointB,
+					title: "point B",
+					label: "B",
+					map: map
+				});
+				calculateAndDisplayRoute(directionsService, directionsDisplay, pointA, pointB);
+			});
+		});
+	}
+
 }
 rhit.AccountPageController = class {
 	constructor() {
