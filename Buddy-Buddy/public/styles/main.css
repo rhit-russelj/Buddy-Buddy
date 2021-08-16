@@ -106,7 +106,7 @@ html {
 }
 
 #accountPage .card-img-top, .card{
-max-width: 35vw;
+    width: 75%
 }
 
 #accountPage .card-title {
@@ -141,4 +141,35 @@ max-width: 35vw;
 
 #findRoutePage {
     text-align: center;
+}
+
+#forumButton{
+    margin: 20px;
+}
+
+#forumCreateButton{
+    box-shadow: 0px 8px 8px rgb(0 0 0 / 10%);
+    margin: 20px;
+    margin-left: 20%;
+}
+
+
+#forumPage .card-title,
+#forumPage .card-text,
+#forumPage .card-author {
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
+    text-overflow: ellipsis;
+}
+
+#menuEdit,
+#menuDelete {
+    display: none;
+}
+
+.dropdown{
+    z-index: 10;
+    color: #FFB55E;
+    left: 95%;
 }

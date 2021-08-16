@@ -44,16 +44,37 @@
     </div>
     <main class="bmd-layout-content">
       <div id="forumPage">
-        <div class="card mx-auto forumPost">
-          <div class="card-body">
-            <h4 class="card-title">Does anyone walk around Hawthorn Park?</h4>
-            <p class="card-text">Click here to view post.</p>
-            <p class="card-author">by Sam Stieby</p>
-          </div>
-        </div>
+        <div id="forumListContainer"></div>
       </div>
     </main>
 
+    <button id="forumCreateButton" type="button" class="btn homeButtons" data-toggle="modal" data-target="#addForum">Start Forum Post</button>
+
+    <!-- Modals -->
+  <div class="modal fade" id="addForum" tabindex="-1" role="dialog" aria-labelledby="Add a new Forum Post"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">New Forum Post</h5>
+      </div>
+      <div class="modal-body">
+        <div class="form-group bmd-form-group">
+          <label for="postTitle" class="bmd-label-floating">Post Title</label>
+          <input type="text" class="form-control" id="postTitle">
+        </div>
+        <div class="form-group bmd-form-group">
+          <label for="postBody" class="bmd-label-floating">Post Body</label>
+          <input type="text" class="form-control" id="postBody">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="submitForumPost" type="button" class="btn btn-primary" data-dismiss="modal">Post</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
     <script src="scripts/jquery.min.js"></script>
     <script src="scripts/popper.js"></script>
     <script src="scripts/bootstrap-material-design.js"></script>
