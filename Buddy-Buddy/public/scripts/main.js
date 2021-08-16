@@ -206,6 +206,10 @@ rhit.ForumDetailPageController = class {
 			}).catch(error => console.error("Error removing document: ", error));
 		});
 
+		document.querySelector("#forumGoBackButton").addEventListener("click", event => {
+			window.location.href = "/Buddy Forum.html";
+		})
+
 		rhit.fbSinglePostManager.beginListening(this.updateView.bind(this));
 	}
 
@@ -443,7 +447,7 @@ rhit.FindRoutePageController = class {
 				lng: 150.644
 			}
 		});
-
+		console.log(map);
 		var directionsService = new google.maps.DirectionsService();
 
 		var directionsDisplay = new google.maps.DirectionsRenderer({

@@ -135,8 +135,10 @@ html {
 }
 
 #addressFrom, #addressTo, #submit  {
-    margin-top: 15px;
+    margin-top: 1vw;
     text-align: center;
+    display: inline;
+    font-family: 'Raleway', sans-serif;
 }
 
 #findRoutePage {
@@ -147,12 +149,24 @@ html {
     margin: 20px;
 }
 
-#forumCreateButton{
+.forumPost {
+    font-family: 'Raleway', sans-serif;
+    margin-bottom: 10px;
+}
+
+#forumCreateButton {
     box-shadow: 0px 8px 8px rgb(0 0 0 / 10%);
     margin: 20px;
     margin-left: 20%;
+    padding: 2vw auto;
+    font-size: 4vw;
 }
 
+@media screen and (min-width: 1165px) {
+    #forumCreateButton {
+        font-size: 2vw;
+    }
+}
 
 #forumPage .card-title,
 #forumPage .card-text,
@@ -163,6 +177,35 @@ html {
     text-overflow: ellipsis;
 }
 
+#forumDropdownToggle {
+    margin-top: 20px
+}
+
+@media screen and (min-width: 675px) {
+    #forumDropdownToggle {
+        left: 95%;
+    }
+}
+
+#forumGoBackButton {
+    font-family: 'Raleway', sans-serif;
+    background-color: white;
+    color: black;
+    width: 30vw;
+    font-size: 2.4vw;
+    margin: 7vw auto auto 2vw;
+    left: 70%;
+}
+
+@media screen and (min-width: 1045px) {
+    #forumGoBackButton {
+        left: 75%;
+        margin: 75px auto auto 2vw;
+        width: 175px;
+        font-size: 15px;
+    }
+}
+
 #menuEdit,
 #menuDelete {
     display: none;
@@ -171,5 +214,10 @@ html {
 .dropdown{
     z-index: 10;
     color: #FFB55E;
-    left: 95%;
+    left: 90%;
+}
+
+#findRoutePage label {
+    font-family: 'Raleway', sans-serif;
+    margin: auto 10px;
 }

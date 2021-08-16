@@ -27,7 +27,7 @@
           style="font-family: Lobster; text-align: center; margin-left:25px">Buddy Forum</a>
       </div>
     </header>
-    <div class="dropdown pull-xs-right">
+    <div id="forumDropdownToggle" class="dropdown pull-xs-right">
       <button class="btn bmd-btn-icon dropdown-toggle" type="button" id="lr1" data-toggle="dropdown"
         aria-haspopup="true" aria-expanded="false">
         <i class="material-icons">more_vert</i>
@@ -36,12 +36,14 @@
         <button id="menuEdit" class="dropdown-item" type="button" data-toggle="modal" data-target="#editPostDialog">
           <i class="material-icons">edit</i>&nbsp;&nbsp;&nbsp;Edit
         </button>
-        <button id="menuDelete" class="dropdown-item" type="button" data-toggle="modal" data-target="#deletePostDialogue"><i
-            class="material-icons">delete</i>&nbsp;&nbsp;&nbsp;Delete</button>
+        <button id="menuDelete" class="dropdown-item" type="button" data-toggle="modal"
+          data-target="#deletePostDialogue"><i class="material-icons">delete</i>&nbsp;&nbsp;&nbsp;Delete</button>
         <button id="menuSignOut" class="dropdown-item" type="button"><i
             class="material-icons">login</i>&nbsp;&nbsp;&nbsp;Sign Out</button>
       </div>
     </div>
+
+    <button id="forumGoBackButton" type="button" class="btn">Go Back to Forum</button>
 
     <div id="dw-s2" class="bmd-layout-drawer bg-faded">
       <header>
@@ -61,59 +63,61 @@
       <div id="singlePostPage">
         <div class="card mx-auto forumPost" style="top:70px">
           <div class="card-body">
-            <h4 id="cardTitle" class="card-title"></h5>
-            <p id="cardBody" class="card-subtitle mb-2 text-muted">Loading...</h6>
-            <p id="cardAuthor" class="card-author"></h5>
+            <h4 id="cardTitle" class="card-title">
+              </h5>
+              <p id="cardBody" class="card-subtitle mb-2 text-muted">Loading...</h6>
+              <p id="cardAuthor" class="card-author">
+                </h5>
           </div>
         </div>
       </div>
     </main>
   </div>
 
-<!-- Modals -->
-<div class="modal fade" id="editPostDialog" tabindex="-1" role="dialog" aria-labelledby="Edit Post dialog"
-aria-hidden="true">
-<div class="modal-dialog modal-dialog-centered" role="document">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Edit Forum Post</h5>
-    </div>
-    <div class="modal-body">
-      <div class="form-group bmd-form-group">
-        <label for="inputTitle">Post Title</label>
-        <input type="text" class="form-control" id="inputTitle" placeholder=" ">
+  <!-- Modals -->
+  <div class="modal fade" id="editPostDialog" tabindex="-1" role="dialog" aria-labelledby="Edit Post dialog"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Forum Post</h5>
+        </div>
+        <div class="modal-body">
+          <div class="form-group bmd-form-group">
+            <label for="inputTitle">Post Title</label>
+            <input type="text" class="form-control" id="inputTitle" placeholder=" ">
+          </div>
+          <div class="form-group bmd-form-group">
+            <label for="inputBody">Post Body</label>
+            <input type="text" class="form-control" id="inputBody" placeholder=" ">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
+          <button id="submitEditPost" type="button" class="btn btn-primary" data-dismiss="modal">SAVE</button>
+        </div>
       </div>
-      <div class="form-group bmd-form-group">
-        <label for="inputBody">Post Body</label>
-        <input type="text" class="form-control" id="inputBody" placeholder=" ">
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
-      <button id="submitEditPost" type="button" class="btn btn-primary" data-dismiss="modal">SAVE</button>
     </div>
   </div>
-</div>
-</div>
 
 
-<div class="modal fade" id="deletePostDialogue" tabindex="-1" role="dialog" aria-labelledby="Delete post dialog"
-aria-hidden="true">
-<div class="modal-dialog modal-dialog-centered" role="document">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Delete this post</h5>
-    </div>
-    <div class="modal-body">
-      Are you sure you want to delete this post?
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
-      <button id="submitDeletePost" type="button" class="btn btn-primary" data-dismiss="modal">DELETE</button>
+  <div class="modal fade" id="deletePostDialogue" tabindex="-1" role="dialog" aria-labelledby="Delete post dialog"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Delete this post</h5>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this post?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
+          <button id="submitDeletePost" type="button" class="btn btn-primary" data-dismiss="modal">DELETE</button>
+        </div>
+      </div>
     </div>
   </div>
-</div>
-</div>
 
 
   <script src="scripts/jquery.min.js"></script>
