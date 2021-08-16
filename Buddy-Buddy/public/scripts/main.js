@@ -1,7 +1,4 @@
 /**
- * @fileoverview
- * Provides the JavaScript interactions for all pages.
- *
  * @author 
  * Sam Stieby and Jessica Russell
  */
@@ -9,8 +6,10 @@
 /** namespace. */
 var rhit = rhit || {};
 rhit.FB_CHATS_COLLECTION = "Chats";
+rhit.FB_CONTACTS_COLLECTION = "Contacts";
+rhit.FB_KEY_CONTACTLIST = "contactList";
 rhit.FB_KEY_MESSAGE = "message";
-rhit.FB_KEY_SENDER = "sender";
+rhit.FB_KEY_CONTACT = "contact";
 rhit.FB_KEY_LAST_TOUCHED = "lastTouched";
 rhit.FB_FORUM_COLLECTION = "Forum";
 rhit.FB_USERS_COLLECTION = "Users";
@@ -35,29 +34,8 @@ function htmlToElement(html) {
 }
 
 rhit.ForumListController = class {
-	constructor(){
-		document.querySelector("#menuFindBuddy").onclick = (event) => {
-			window.location.href = "/Find Buddy.html";
-		};
-		document.querySelector("#menuFindRoute").onclick = (event) => {
-			window.location.href = "/Find Route.html";
-		};
-		document.querySelector("#menuGoToHomePage").onclick = (event) => {
-			window.location.href = "/Homepage.html";
-		};
-		document.querySelector("#menuForum").onclick = (event) => {
-			window.location.href = "/Buddy Forum.html";
-		};
-		document.querySelector("#menuChat").onclick = (event) => {
-			window.location.href = `/Chat.html?uid=${rhit.fbAuthManager.uid}`;
-		};
-		document.querySelector("#menuGoToProfilePage").onclick = (event) => {
-			window.location.href = "/Profile.html";
-		}
-		document.querySelector("#menuSignOut").onclick = (event) => {
-			rhit.fbAuthManager.signOut();
-			window.location.href = "/index.html";
-		}
+	constructor() {
+		rhit.HandleDrawerButtons();
 
 		document.querySelector("#submitForumPost").addEventListener("click", (event) => {
 			const title = document.querySelector("#postTitle").value;
@@ -86,12 +64,12 @@ rhit.ForumListController = class {
 
 
 		const newList = htmlToElement('<div id="forumListContainer"></div>');
-		
+
 		for (let i = 0; i < rhit.fbForumManager.length; i++) {
-			const mq = rhit.fbForumManager.getPostIndex(i);
-			const newCard = this._createCard(mq);
+			const post = rhit.fbForumManager.getPostIndex(i);
+			const newCard = this._createCard(post);
 			newCard.onclick = (event) => {
-				window.location.href = `/PostDetail.html?id=${mq.id}`;
+				window.location.href = `/PostDetail.html?id=${post.id}`;
 			};
 			newList.appendChild(newCard);
 		}
@@ -108,7 +86,7 @@ rhit.ForumListController = class {
 		<div class="card-body">
 		  <h4 class="card-title">${post.title}</h4>
 		  <p class="card-text">${post.body}</p>
-		  <p class="card-author">By ${post.author}</p>
+		  <p class="card-author">By: ${post.author}</p>
 		</div>
 	  </div>`);
 	}
@@ -124,7 +102,7 @@ rhit.Post = class {
 }
 
 rhit.FbForumManager = class {
-	constructor(uid){
+	constructor(uid) {
 		this._uid = uid;
 		this._documentSnapshots = [];
 		this._ref = firebase.firestore().collection(rhit.FB_FORUM_COLLECTION);
@@ -134,11 +112,11 @@ rhit.FbForumManager = class {
 	add(title, body, author) {
 		// Add a new document with a generated id.
 		this._ref.add({
-				[rhit.FB_KEY_TITLE]: title,
-				[rhit.FB_KEY_BODY]: body,
-				[rhit.FB_KEY_AUTHOR]: author,
-				[rhit.FB_KEY_LAST_TOUCHED]: firebase.firestore.Timestamp.now(),
-			})
+			[rhit.FB_KEY_TITLE]: title,
+			[rhit.FB_KEY_BODY]: body,
+			[rhit.FB_KEY_AUTHOR]: author,
+			[rhit.FB_KEY_LAST_TOUCHED]: firebase.firestore.Timestamp.now(),
+		})
 			.then(function (docRef) {
 				console.log("Document written with ID: ", docRef.id);
 			})
@@ -151,14 +129,14 @@ rhit.FbForumManager = class {
 
 		let query = this._ref.orderBy(rhit.FB_KEY_LAST_TOUCHED, "desc").limit(50);
 		if (this._uid) {
-				query = query.where(rhit.FB_KEY_AUTHOR, "==", this._uid);
+			query = query.where(rhit.FB_KEY_AUTHOR, "==", this._uid);
 		}
-		
+
 		this._unsubscribe = query.onSnapshot((querySnapshot) => {
-				console.log("Post update!");
-				this._documentSnapshots = querySnapshot.docs;
-				changeListener();
-			});
+			console.log("Post update!");
+			this._documentSnapshots = querySnapshot.docs;
+			changeListener();
+		});
 	}
 
 	stopListening() {
@@ -171,11 +149,11 @@ rhit.FbForumManager = class {
 
 	getPostIndex(index) {
 		const docSnapshot = this._documentSnapshots[index];
-		const mq = new rhit.Post(docSnapshot.id,
+		const post = new rhit.Post(docSnapshot.id,
 			docSnapshot.get(rhit.FB_KEY_TITLE),
 			docSnapshot.get(rhit.FB_KEY_BODY),
 			docSnapshot.get(rhit.FB_KEY_AUTHOR));
-		return mq;
+		return post;
 	}
 }
 
@@ -226,6 +204,7 @@ rhit.ForumDetailPageController = class {
 
 rhit.FbSinglePostManager = class {
 	constructor(postId) {
+		rhit.HandleDrawerButtons();
 		this._documentSnapshot = {};
 		this._unsubscribe = null;
 		this._ref = firebase.firestore().collection(rhit.FB_FORUM_COLLECTION).doc(postId);
@@ -251,11 +230,11 @@ rhit.FbSinglePostManager = class {
 
 	update(title, body, author) {
 		this._ref.update({
-				[rhit.FB_KEY_TITLE]: title,
-				[rhit.FB_KEY_BODY]: body,
-				[rhit.FB_KEY_AUTHOR]: author,
-				[rhit.FB_KEY_LAST_TOUCHED]: firebase.firestore.Timestamp.now(),
-			})
+			[rhit.FB_KEY_TITLE]: title,
+			[rhit.FB_KEY_BODY]: body,
+			[rhit.FB_KEY_AUTHOR]: author,
+			[rhit.FB_KEY_LAST_TOUCHED]: firebase.firestore.Timestamp.now(),
+		})
 			.then(() => {
 				console.log("Document successfully updated!");
 			})
@@ -321,69 +300,61 @@ rhit.HomePageController = class {
 		};
 	}
 }
+
 rhit.ChatPageController = class {
 	constructor() {
 		rhit.HandleDrawerButtons();
-		// rhit.fbChatsManager.beginListening(this.updateList.bind(this));
-		document.querySelector("#exampleBuddy").addEventListener("click", (event) => {
-			const sender = document.querySelector("#sender").value;
-			const message = document.querySelector("#message").value;
-			rhit.fbChatsManager.add(sender, message);
-		});
+		rhit.fbChatsManager.beginListening(this.updateList.bind(this));
+		this.lastMessage = "";
+	}
 
+	updateList() {
+		const newList = htmlToElement('<div id="chatListContainer"></div>');
+		for (let i = 0; i < rhit.fbChatsManager.length; i++) {
+			const chat = rhit.fbChatsManager.getChatAtIndex(i);
+			const newCard = this._createCard(chat);
+			newCard.onclick = (event) => {
+				window.location.href = `/Single Chat.html?id=${chat.index}`;
+			}
+			newList.appendChild(newCard);
+		}
+
+		const oldList = document.querySelector("#chatListContainer");
+		oldList.removeAttribute("id");
+		oldList.hidden = true;
+		oldList.parentElement.appendChild(newList);
 	}
 
 	_createCard(buddy) {
 		return htmlToElement(`      
-	<div class="card">
+	<div id="contactCard" class="card">
 		<div class="card-body">
-		  <h5 class="card-title">${buddy}</h5>
+		  <h5 class="card-title">Chat with ${buddy.buddyId}</h5>
 		</div>
 	</div>`);
 	}
 
-	updateBuddies() {
-		const newBuddyList = htmlToElement('<div id="buddyListContainer"></div>');
-		for (let i = 0; i < rhit.fbChatsManager.length; i++) {
-			const chat = rhit.fbChatsManager.getChatAtIndex(i);
-			const newCard = this._createCard(chat);
-			const chatUrlParam = `${chat.uid}` + `${this._uid}`;
-			newCard.onclick = (event) => {
-				window.location.href = `/Single Chat.html?id=${chatUrlParam}`;
-			};
-			newBuddyList.appendChild(newCard);
-		}
-
-		const oldList = document.querySelector("#buddyListContainer");
-		oldList.removeAttribute("uid");
-		oldList.hidden = true;
-
-		oldList.parentElement.appendChild(newBuddyList);
-	}
-
 }
-rhit.SingleChatController = class {
-	constructor(id, sender, message) {
-		this.id = id;
-		this.sender = sender;
-		this.message = message;
-		HandleDrawerButtons();
+
+rhit.chat = class {
+	constructor(index, buddyId) {
+		this.index = index;
+		this.buddyId = buddyId;
 	}
 }
+
 rhit.FbChatsManager = class {
 	constructor(uid) {
 		this._uid = uid;
-		this._documentSnapshot = [];
+		this._documentSnapshots = [];
+		this._ref = firebase.firestore().collection(rhit.FB_CONTACTS_COLLECTION).doc(uid);
 		this._unsubscribe = null;
-		this._ref = firebase.firestore().collection(rhit.FB_CHATS_COLLECTION);
 	}
 
-	add(sender, message) {
-
+	add(contact) {
 		this._ref.add({
-			[rhit.FB_KEY_SENDER]: sender,
-			[rhit.FB_KEY_MESSAGE]: message,
-			[rhit.FB_KEY_LAST_TOUCHED]: firebase.firestore.Timestamp.now(),
+			[rhit.FB_KEY_CONTACTLIST_ID]: this._uid,
+			[rhit.FB_KEY_CONTACT]: contact
 		})
 			.then(function (docRef) {
 				console.log("Document written with ID: ", docRef.id);
@@ -395,29 +366,24 @@ rhit.FbChatsManager = class {
 	}
 
 	beginListening(changeListener) {
-		// let query = this._ref.where(rhit.FB_KEY_SENDER, "==", this._uid);
-		this._unsubscribe = this._ref.onSnapshot((doc) => {
-			this._documentSnapshot = doc;
+		this._unsubscribe = this._ref.onSnapshot((querySnapshot) => {
+			console.log("Updating Contact list!");
+			this._documentSnapshots = querySnapshot;
 			changeListener();
-		})
+		});
 	}
 
 	stopListening() {
 		this._unsubscribe();
 	}
-	// update(id, quote, movie) {    }
-	// delete(id) { }
+
 	get length() {
 		return this._documentSnapshots.length;
 	}
 
-	getChatAtIndex(index) {
-		const docSnapshot = this._documentSnapshots[index];
-		const chat = new rhit.MovieQuote(
-			docSnapshot.id,
-			docSnapshot.get(rhit.FB_KEY_MESSAGE),
-			docSnapshot.get(rhit.FB_KEY_SENDER)
-		);
+	getAtIndex(index) {
+		const docSnapshot = new rhit.chat(this._documentSnapshots[index]);
+		const chat = new rhit.chat(docSnapshot.get());
 		return chat;
 	}
 
@@ -428,6 +394,7 @@ rhit.FindBuddyPageController = class {
 		rhit.HandleDrawerButtons();
 	}
 }
+
 rhit.FindRoutePageController = class {
 	constructor() {
 		rhit.HandleDrawerButtons();
@@ -435,7 +402,7 @@ rhit.FindRoutePageController = class {
 		document.querySelector("#submit").onclick = (event) => {
 			let A = document.querySelector("#addressFrom").value;
 			let B = document.querySelector("#addressTo").value;
-			this.initMap(A, B);			
+			this.initMap(A, B);
 		}
 	}
 
@@ -490,11 +457,13 @@ rhit.FindRoutePageController = class {
 	}
 
 }
+
 rhit.AccountPageController = class {
 	constructor() {
 		rhit.HandleDrawerButtons();
 	}
 }
+
 rhit.FbAuthManager = class {
 	constructor() {
 		this._user = null;
@@ -554,6 +523,7 @@ rhit.checkForRedirects = function () {
 		window.location.href = "/";
 	}
 }
+
 rhit.initializePage = function () {
 	const urlParams = new URLSearchParams(window.location.search);
 	if (document.querySelector("#loginPage")) {
@@ -598,6 +568,7 @@ rhit.initializePage = function () {
 		new rhit.FindBuddyPageController();
 	}
 }
+
 rhit.HandleDrawerButtons = function () {
 	document.querySelector("#menuFindBuddy").onclick = (event) => {
 		window.location.href = "/Find Buddy.html";
@@ -622,6 +593,7 @@ rhit.HandleDrawerButtons = function () {
 		window.location.href = "/index.html";
 	}
 }
+
 rhit.main = function () {
 	console.log("Ready");
 	// initMap();
@@ -632,4 +604,5 @@ rhit.main = function () {
 		rhit.initializePage();
 	});
 };
+
 rhit.main();
