@@ -36,6 +36,7 @@
         <a id="menuGoToProfilePage" class="list-group-item"><i class="material-icons">account_box</i>My Account</a>
         <a id="menuFindBuddy" class="list-group-item"><i class="material-icons">people</i>Find Buddy</a>
         <a id="menuFindRoute" class="list-group-item"><i class="material-icons">add_location</i>Find Route</a>
+        <a id="menuConfirmedRoute" class="list-group-item"><i class="material-icons">check_circle</i>Confirmed Route</a>
         <a id="menuChat" class="list-group-item"><i class="material-icons">chat</i>Chat with Buddies</a>
         <a id="menuForum" class="list-group-item"><i class="material-icons">forum</i>Buddy Forum</a>
         <a id="menuSignOut" class="list-group-item"><i class="material-icons">logout</i>Sign Out</a>
@@ -48,7 +49,11 @@
       <input id="addressFrom" type="textbox" value="Terre Haute, IN" />
       <label>Where would you like to go?</label>
       <input id="addressTo" type="textbox" value="Brazil, IN" />
-      <input id="submit" type="button" value="Show Route" />
+      <input id="submit" type="button" class="btn" value="Show Route" />
+      <div>
+        <label>Is this your desired route?</label>
+        <input id="submitAddRoute" type="Button" class="btn" value="yes"></input>
+      </div>
     </main>
     <script async
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyALx0qlTry0xl-TA0FxSvn5q2ABIMXBss0&libraries=&v=weekly&callback=initmap"></script>

@@ -16,6 +16,9 @@ rhit.FB_USERS_COLLECTION = "Users";
 rhit.FB_KEY_AUTHOR = "author";
 rhit.FB_KEY_TITLE = "title";
 rhit.FB_KEY_BODY = "body";
+rhit.FB_ROUTES_COLLECTION = "Routes";
+rhit.FB_KEY_POINTA = "pointA";
+rhit.FB_KEY_POINTB = "pointB";
 
 let map;
 
@@ -24,6 +27,7 @@ rhit.fbUsersManager = null;
 rhit.fbChatsManager = null;
 rhit.fbForumManager = null;
 rhit.fbSinglePostManager = null;
+rhit.fbRoutesManager = null;
 
 // From https://stackoverflow.com/questions/494143/creating-a-new-dom-element-from-an-html-string-using-built-in-dom-methods-or-pro
 function htmlToElement(html) {
@@ -290,7 +294,7 @@ rhit.HomePageController = class {
 			window.location.href = "/Find Buddy.html";
 		};
 		document.querySelector("#findRouteButton").onclick = (event) => {
-			window.location.href = "/Find Route.html";
+			window.location.href = `/Find Route.html?uid=${rhit.fbAuthManager.uid}`;
 		};
 		document.querySelector("#chatButton").onclick = (event) => {
 			window.location.href = `/Chat.html?uid=${rhit.fbAuthManager.uid}`;
@@ -396,66 +400,95 @@ rhit.FindBuddyPageController = class {
 }
 
 rhit.FindRoutePageController = class {
-	constructor() {
+	constructor(uid) {
 		rhit.HandleDrawerButtons();
-		this.initMap();
+		initMap();
 		document.querySelector("#submit").onclick = (event) => {
 			let A = document.querySelector("#addressFrom").value;
 			let B = document.querySelector("#addressTo").value;
-			this.initMap(A, B);
+			initMap(A, B);
+		}
+		document.querySelector("#submitAddRoute").onclick = (event) => {
+			let A = document.querySelector("#addressFrom").value;
+			let B = document.querySelector("#addressTo").value;
+			let uid = rhit.fbAuthManager.uid;
+			rhit.fbRoutesManager.add(A, B, uid);
 		}
 	}
+}
 
-	initMap(pointA, pointB) {
-		var map = new google.maps.Map(document.getElementById('map'), {
-			zoom: 8,
-			center: {
-				lat: -34.397,
-				lng: 150.644
-			}
+rhit.FbRoutesManager = class {
+	constructor(uid) {
+		this._uid = uid;
+		this._documentSnapshots = [];
+		this._ref = firebase.firestore().collection(rhit.FB_ROUTES_COLLECTION);;
+		this._unsubscribe = null;
+	}
+
+	add(A, B) {
+		this._ref.add({
+			[rhit.FB_KEY_AUTHOR]: this._uid,
+			[rhit.FB_KEY_POINTA]: A,
+			[rhit.FB_KEY_POINTB]: B,
+			[rhit.FB_KEY_LAST_TOUCHED]: firebase.firestore.Timestamp.now()
 		});
-		console.log(map);
-		var directionsService = new google.maps.DirectionsService();
+	}
+}
 
-		var directionsDisplay = new google.maps.DirectionsRenderer({
+rhit.ConfirmedRoutePageController = class {
+	constructor(uid) {
+
+	}
+}
+
+function initMap(pointA, pointB) {
+	var map = new google.maps.Map(document.getElementById('map'), {
+		zoom: 8,
+		center: {
+			lat: -34.397,
+			lng: 150.644
+		}
+	});
+	console.log(map);
+	var directionsService = new google.maps.DirectionsService();
+
+	var directionsDisplay = new google.maps.DirectionsRenderer({
+		map: map
+	});
+	var geocoder = new google.maps.Geocoder();
+
+	// var pointA, pointB;
+
+
+	geocoder.geocode({
+		'address': document.getElementById('addressFrom').value
+	}, function (results, status) {
+		if (status != "OK") return;
+		var location = results[0].geometry.location;
+		pointA = new google.maps.LatLng(location.lat(), location.lng());
+		// alert(location.lat() + ',' + location.lng());
+		var markerA = new google.maps.Marker({
+			position: pointA,
+			title: "point A",
+			label: "A",
 			map: map
 		});
-		var geocoder = new google.maps.Geocoder();
-
-		// var pointA, pointB;
-
-
 		geocoder.geocode({
-			'address': document.getElementById('addressFrom').value
+			'address': document.getElementById('addressTo').value
 		}, function (results, status) {
 			if (status != "OK") return;
 			var location = results[0].geometry.location;
-			pointA = new google.maps.LatLng(location.lat(), location.lng());
+			pointB = new google.maps.LatLng(location.lat(), location.lng());
 			// alert(location.lat() + ',' + location.lng());
-			var markerA = new google.maps.Marker({
-				position: pointA,
-				title: "point A",
-				label: "A",
+			var markerB = new google.maps.Marker({
+				position: pointB,
+				title: "point B",
+				label: "B",
 				map: map
 			});
-			geocoder.geocode({
-				'address': document.getElementById('addressTo').value
-			}, function (results, status) {
-				if (status != "OK") return;
-				var location = results[0].geometry.location;
-				pointB = new google.maps.LatLng(location.lat(), location.lng());
-				// alert(location.lat() + ',' + location.lng());
-				var markerB = new google.maps.Marker({
-					position: pointB,
-					title: "point B",
-					label: "B",
-					map: map
-				});
-				calculateAndDisplayRoute(directionsService, directionsDisplay, pointA, pointB);
-			});
+			calculateAndDisplayRoute(directionsService, directionsDisplay, pointA, pointB);
 		});
-	}
-
+	});
 }
 
 rhit.AccountPageController = class {
@@ -561,11 +594,18 @@ rhit.initializePage = function () {
 	}
 	if (document.querySelector("#findRoutePage")) {
 		console.log("You are on the find route page.");
+		const uid = urlParams.get("uid");
+		rhit.fbRoutesManager = new rhit.FbRoutesManager(uid);
 		new rhit.FindRoutePageController();
 	}
 	if (document.querySelector("#findBuddyPage")) {
 		console.log("You are on the find buddy page.");
 		new rhit.FindBuddyPageController();
+	}
+	if (document.querySelector("#routeConfirmedPage")) {
+		console.log("You are on the confirmed route page.");
+		const uid = urlParams.get("uid");
+		new rhit.ConfirmedRoutePageController(uid);
 	}
 }
 
@@ -574,8 +614,11 @@ rhit.HandleDrawerButtons = function () {
 		window.location.href = "/Find Buddy.html";
 	};
 	document.querySelector("#menuFindRoute").onclick = (event) => {
-		window.location.href = "/Find Route.html";
+		window.location.href = `/Find Route.html?uid=${rhit.fbAuthManager.uid}`;
 	};
+	document.querySelector("#menuConfirmedRoute").onclick = (event) => {
+		window.location.href = `/Confirmed Route.html?uid=${rhit.fbAuthManager.uid}`
+	}
 	document.querySelector("#menuGoToHomePage").onclick = (event) => {
 		window.location.href = "/Homepage.html";
 	};

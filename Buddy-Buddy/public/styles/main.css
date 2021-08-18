@@ -221,3 +221,16 @@ html {
     font-family: 'Raleway', sans-serif;
     margin: auto 10px;
 }
+
+#findRoutePage #submit, #findRoutePage #submitAddRoute {
+    color: black;
+    margin-top: 0;
+    margin-left: 5px;
+    background-color: white;
+}
+
+#routeConfirmedPage h1 {
+    margin-top: 75px;
+    font-family: 'Raleway', sans-serif;
+    text-align: center;
+}
