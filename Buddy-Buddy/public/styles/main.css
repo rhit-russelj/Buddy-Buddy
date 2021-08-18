@@ -50,16 +50,25 @@ html {
 
 .homeButtons {
     background-color: white;
-    margin-top: 20px;
     width: 65vw;
-    height: 15vh;
+    height: 200px;
     font-family: Raleway; 
     font-weight: 700;
     font-size: 2.9vh;
+    margin: 20px auto 10px 19%;
 }
-
 #buttonPage {
     width: 100%;
+    display: block;
+}
+@media screen and (min-width: 545px) {
+    #buttonPage {
+        display: flex;
+    }
+    .homeButtons {
+        height: 440px;
+        margin: 10px;
+    }
 }
 
 .bmd-layout-drawer>header {

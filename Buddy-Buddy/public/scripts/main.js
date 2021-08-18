@@ -104,7 +104,7 @@ rhit.FbAccountManager = class {
 		rhit.HandleDrawerButtons();
 		this._documentSnapshot = {};
 		this._unsubscribe = null;
-		this._ref = firebase.firestore().collection(rhit.FB_USERS_COLLECTION.doc(uid));
+		this._ref = firebase.firestore().collection(rhit.FB_USERS_COLLECTION).doc(uid);
 	}
 
 	beginListening(changeListener) {
@@ -417,10 +417,7 @@ rhit.HomePageController = class {
 		document.querySelector("#findRouteButton").onclick = (event) => {
 			window.location.href = `/Find Route.html?uid=${rhit.fbAuthManager.uid}`;
 		};
-		document.querySelector("#chatButton").onclick = (event) => {
-			window.location.href = `/Chat.html?uid=${rhit.fbAuthManager.uid}`;
-		};
-		document.querySelector("#forumButton").onclick = (event) => {
+		document.querySelector("#homeForumButton").onclick = (event) => {
 			window.location.href = "/Buddy Forum.html";
 		};
 	}
