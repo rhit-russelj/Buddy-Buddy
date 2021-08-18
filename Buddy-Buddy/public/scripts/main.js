@@ -420,6 +420,7 @@ rhit.FindRoutePageController = class {
 			let uid = rhit.fbAuthManager.uid;
 			rhit.fbRoutesManager.add(A, B, bud);
 			rhit.hasRoute();
+			alert("Navigate to the Confirmed Route page to see your confirmed route!")
 		}
 	}
 }
