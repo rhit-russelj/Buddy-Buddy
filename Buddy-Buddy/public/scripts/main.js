@@ -16,6 +16,9 @@ rhit.FB_USERS_COLLECTION = "Users";
 rhit.FB_KEY_AUTHOR = "author";
 rhit.FB_KEY_TITLE = "title";
 rhit.FB_KEY_BODY = "body";
+rhit.FB_KEY_URL = "url";
+rhit.FB_KEY_NAME = "name";
+rhit.FB_KEY_LOCATION = "location";
 
 let map;
 
@@ -24,6 +27,7 @@ rhit.fbUsersManager = null;
 rhit.fbChatsManager = null;
 rhit.fbForumManager = null;
 rhit.fbSinglePostManager = null;
+rhit.fbAccountManager = null;
 
 // From https://stackoverflow.com/questions/494143/creating-a-new-dom-element-from-an-html-string-using-built-in-dom-methods-or-pro
 function htmlToElement(html) {
@@ -32,6 +36,94 @@ function htmlToElement(html) {
 	template.innerHTML = html;
 	return template.content.firstChild;
 }
+
+rhit.ProfilePageController = class {
+	constructor(){
+		document.querySelector("#submitEditAccount").addEventListener("click", (event) => {
+			const name = document.querySelector("#editInputName").value;
+			const location = document.querySelector("#editInputLocation").value;
+			const url = document.querySelector("#editInputURL").value;
+			rhit.fbAccountManager.update(name, location, url);
+		});
+	
+		$("#editAccountDialog").on("show.bs.modal", (event) => {
+			// Pre animation
+			document.querySelector("#editInputName").value = rhit.fbAccountManager.name;
+			document.querySelector("#editInputLocation").value = rhit.fbAccountManager.location;
+			document.querySelector("#editInputURL").value = rhit.fbAccountManager.url;
+		});
+		$("#editAccountDialog").on("shown.bs.modal", (event) => {
+			// Post animation
+			document.querySelector("#editInputName").focus();
+		});
+
+		rhit.fbAccountManager.beginListening(this.updateView.bind(this));
+
+	}
+	updateView() {
+		const newList = htmlToElement('<div id="accountPage"></div>');
+
+		
+		document.querySelector("#accountUrl").innerHTML = `<img class="img-fluid card-img-top" style="margin: 20px; max-height: 375px;" src="${rhit.fbAccountManager.url}">`;
+		document.querySelector("#accountName").innerHTML = rhit.fbAccountManager.name;
+		document.querySelector("#accountEmail").innerHTML = rhit.fbAccountManager.email;
+		document.querySelector("#accountSLocation").innerHTML = rhit.fbAccountManager.url;
+	}
+}
+
+rhit.FbAccountManager = class {
+	constructor(uid) {
+		this.add()
+		rhit.HandleDrawerButtons();
+		this._documentSnapshot = {};
+		this._unsubscribe = null;
+		this._ref = firebase.firestore().collection(rhit.FB_USERS_COLLECTION.doc(uid));
+	}
+
+	beginListening(changeListener) {
+		this._unsubscribe = this._ref.onSnapshot((doc) => {
+			if (doc.exists) {
+				console.log("Document data:", doc.data());
+				this._documentSnapshot = doc;
+				changeListener();
+			} else {
+				console.log("No such document!");
+			}
+		});
+	}
+
+	stopListening() {
+		this._unsubscribe();
+	}
+
+	update(name, location, url) {
+		this._ref.update({
+			[rhit.FB_KEY_NAME]: name,
+			[rhit.FB_KEY_AUTHOR]: rhit.fbAuthManager.uid,
+			[rhit.FB_KEY_LOCATION]: location,
+			[rhit.FB_KEY_URL]: url,
+		})
+		.then(() => {
+			console.log("Document successfully updated!");
+		})
+		.catch(function (error) {
+			console.error("Error updating document: ", error);
+		});
+	}
+
+	get name() {
+		return this._documentSnapshot.get(rhit.FB_KEY_NAME);
+	}
+
+	get location() {
+		return this._documentSnapshot.get(rhit.FB_KEY_LOCATION);
+	}
+
+	get url() {
+		return this._documentSnapshot.get(rhit.FB_KEY_URL);
+	}
+}
+
 
 rhit.ForumListController = class {
 	constructor() {
@@ -557,6 +649,7 @@ rhit.initializePage = function () {
 	}
 	if (document.querySelector("#accountPage")) {
 		console.log("You are on the profile page.");
+		rhit.fbAccountManager = new rhit.FbAccountManager(rhit.fbAuthManager.uid);
 		new rhit.AccountPageController();
 	}
 	if (document.querySelector("#findRoutePage")) {

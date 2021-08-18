@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/main.css">
-  <title>Profile</title>
+  <title>Account Profile</title>
 </head>
 
 <body>
@@ -24,7 +24,7 @@
           <i class="material-icons">menu</i>
         </button>
         <a id="homePageLink" class="navbar-brand" href="Homepage.html"
-          style="font-family: Lobster; text-align: center; margin-left:25px">My Profile</a>
+          style="font-family: Lobster; text-align: center; margin-left:25px">My Account</a>
       </div>
     </header>
     <div id="dw-s2" class="bmd-layout-drawer bg-faded">
@@ -42,19 +42,57 @@
       </ul>
     </div>
     <main class="bmd-layout-content">
-      <div id="accountPage">
-        <div class="card mx-auto">
-          <img class="card-img-top"
-            src="https://cdn.mlbtraderumors.com/files/old/6a00d834515b9a69e201901ca2f9da970b-pi.jpg" alt="Your profile picture">
-          <div class="card-body">
-            <h4 class="card-title">Jarrod Saltalamacchia</h4>
-            <p class="card-text">Some example text.</p>
+        
+        <div id="accountPage" class="container page-container">
+          <div class="card mx-auto profile-style">
+              <div class="card-body">
+                  <div id="accountUrl"><img style="margin: 20px; max-height: 375px;" class="card-img-top"
+            src="https://cdn.mlbtraderumors.com/files/old/6a00d834515b9a69e201901ca2f9da970b-pi.jpg"
+            alt="Your profile picture"></div>
+                  <h4 id="accountName"></h4>
+                  <p id="accountEmail" class="card-text"></p>
+                  <p id="accountSLocation" class="card-text"></p>
+              </div>
           </div>
         </div>
-        <button type="button" id="editAccountButton" class="btn">Edit Account</button>
-      </div>
+        <button type="button" id="editAccountButton" class="btn" data-toggle="modal"
+          data-target="#editAccountDialog">Edit Account</button>
+
     </main>
   </div>
+
+  <!-- Modals -->
+  <div class="modal fade" id="editAccountDialog" tabindex="-1" role="dialog" aria-labelledby="Edit Account dialog"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Account Info</h5>
+        </div>
+        <div class="modal-body">
+          <div class="form-group bmd-form-group">
+            <label for="editInputName">Member Name</label>
+            <input type="text" class="form-control" id="editInputName" placeholder=" ">
+          </div>
+          <div class="form-group bmd-form-group">
+            <label for="editInputLocation">Starting Location</label>
+            <input type="text" class="form-control" id="editInputLocation" placeholder=" ">
+            <span class="bmd-help">Where would you like to meet others to start walking from?</span>
+          </div>
+          <div class="form-group bmd-form-group">
+            <label for="editInputURL" class="bmd-label-floating">Profile Image Url</label>
+            <input type="text" class="form-control" id="editInputURL">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
+          <button id="submitEditAccount" type="button" class="btn btn-primary" data-dismiss="modal">SAVE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <script src="scripts/jquery.min.js"></script>
   <script src="scripts/popper.js"></script>
   <script src="scripts/bootstrap-material-design.js"></script>
