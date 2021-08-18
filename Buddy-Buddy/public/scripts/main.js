@@ -22,6 +22,7 @@ rhit.FB_KEY_POINTB = "pointB";
 rhit.FB_KEY_BUDDY_NAME = "buddyName";
 
 let map;
+rhit.hasRoute = "";
 
 rhit.fbAuthManager = null;
 rhit.fbUsersManager = null;
@@ -402,7 +403,7 @@ rhit.FindBuddyPageController = class {
 }
 
 rhit.FindRoutePageController = class {
-	constructor(uid) {
+	constructor() {
 		rhit.HandleDrawerButtons();
 		let A = document.querySelector("#addressFrom").value;
 		let B = document.querySelector("#addressTo").value;
@@ -418,6 +419,7 @@ rhit.FindRoutePageController = class {
 			let bud = document.querySelector("#inputBuddyName").value;
 			let uid = rhit.fbAuthManager.uid;
 			rhit.fbRoutesManager.add(A, B, bud);
+			rhit.hasRoute();
 		}
 	}
 }
@@ -426,11 +428,12 @@ rhit.FbRoutesManager = class {
 	constructor(uid) {
 		this._uid = uid;
 		this._documentSnapshots = [];
-		this._ref = firebase.firestore().collection(rhit.FB_ROUTES_COLLECTION);;
+		this._ref = firebase.firestore().collection(rhit.FB_ROUTES_COLLECTION);
 		this._unsubscribe = null;
 	}
 
 	add(A, B, buddy) {
+		this.hasRoute = true;
 		this._ref.add({
 			[rhit.FB_KEY_AUTHOR]: this._uid,
 			[rhit.FB_KEY_POINTA]: A,
@@ -439,6 +442,7 @@ rhit.FbRoutesManager = class {
 			[rhit.FB_KEY_LAST_TOUCHED]: firebase.firestore.Timestamp.now()
 		});
 	}
+
 }
 
 rhit.ConfirmedRoutePageController = class {
@@ -448,8 +452,11 @@ rhit.ConfirmedRoutePageController = class {
 	}
 
 	updateMap() {
-		document.querySelector("#buddyOutput").innerHTML = `<h2 id="buddyOutput">You are walking with ${rhit.fbConfirmRoutePageManager.buddyName}!</h2>
-		<div id="salutations">Stay safe and enjoy your trip!</div>`
+		document.querySelector("#buddyOutput").innerHTML = `
+		<div id="outputSalutations">
+		<h2 id="buddyOutput">You are walking with ${rhit.fbConfirmRoutePageManager.buddyName}!</h2>
+		<h2 id="salutations">Stay safe and enjoy your trip!</h2>
+		</div>`
 		initMap(rhit.fbConfirmRoutePageManager.pointA, rhit.fbConfirmRoutePageManager.pointB);
 	}
 }
@@ -581,9 +588,6 @@ rhit.FbAuthManager = class {
 					console.error("Custom auth error", errorCode, errorMessage);
 				}
 			});
-			let name = rfUser.name;
-			let email = rfUser.email;
-			let uid = rfUser.username;
 		});
 
 	}
@@ -665,16 +669,31 @@ rhit.initializePage = function () {
 	}
 }
 
+rhit.hasRoute = function () {
+	firebase.firestore().collection(rhit.FB_ROUTES_COLLECTION).get().then(snap => {
+		let size = parseInt(snap.size);
+		if (size > 0) {
+			document.querySelector("#menuConfirmedRoute").onclick = (event) => {
+				window.location.href = `/Confirmed Route.html?uid=${rhit.fbAuthManager.uid}`;
+			}
+		}
+		if (size <= 0) {
+			document.querySelector("#menuConfirmedRoute").onclick = (event) => {
+				alert("Create a route first!");
+			}
+		}
+	}
+	);
+}
+
 rhit.HandleDrawerButtons = function () {
+	rhit.hasRoute();
 	document.querySelector("#menuFindBuddy").onclick = (event) => {
 		window.location.href = "/Find Buddy.html";
 	};
 	document.querySelector("#menuFindRoute").onclick = (event) => {
 		window.location.href = `/Find Route.html?uid=${rhit.fbAuthManager.uid}`;
 	};
-	document.querySelector("#menuConfirmedRoute").onclick = (event) => {
-		window.location.href = `/Confirmed Route.html?uid=${rhit.fbAuthManager.uid}`
-	}
 	document.querySelector("#menuGoToHomePage").onclick = (event) => {
 		window.location.href = "/Homepage.html";
 	};
