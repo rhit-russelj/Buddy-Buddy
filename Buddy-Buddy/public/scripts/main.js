@@ -19,6 +19,7 @@ rhit.FB_KEY_BODY = "body";
 rhit.FB_ROUTES_COLLECTION = "Routes";
 rhit.FB_KEY_POINTA = "pointA";
 rhit.FB_KEY_POINTB = "pointB";
+rhit.FB_KEY_BUDDY_NAME = "buddyName";
 
 let map;
 
@@ -28,6 +29,7 @@ rhit.fbChatsManager = null;
 rhit.fbForumManager = null;
 rhit.fbSinglePostManager = null;
 rhit.fbRoutesManager = null;
+rhit.fbConfirmRoutePageManager = null;
 
 // From https://stackoverflow.com/questions/494143/creating-a-new-dom-element-from-an-html-string-using-built-in-dom-methods-or-pro
 function htmlToElement(html) {
@@ -402,7 +404,9 @@ rhit.FindBuddyPageController = class {
 rhit.FindRoutePageController = class {
 	constructor(uid) {
 		rhit.HandleDrawerButtons();
-		initMap();
+		let A = document.querySelector("#addressFrom").value;
+		let B = document.querySelector("#addressTo").value;
+		initMap(A, B);
 		document.querySelector("#submit").onclick = (event) => {
 			let A = document.querySelector("#addressFrom").value;
 			let B = document.querySelector("#addressTo").value;
@@ -411,8 +415,9 @@ rhit.FindRoutePageController = class {
 		document.querySelector("#submitAddRoute").onclick = (event) => {
 			let A = document.querySelector("#addressFrom").value;
 			let B = document.querySelector("#addressTo").value;
+			let bud = document.querySelector("#inputBuddyName").value;
 			let uid = rhit.fbAuthManager.uid;
-			rhit.fbRoutesManager.add(A, B, uid);
+			rhit.fbRoutesManager.add(A, B, bud);
 		}
 	}
 }
@@ -425,23 +430,73 @@ rhit.FbRoutesManager = class {
 		this._unsubscribe = null;
 	}
 
-	add(A, B) {
+	add(A, B, buddy) {
 		this._ref.add({
 			[rhit.FB_KEY_AUTHOR]: this._uid,
 			[rhit.FB_KEY_POINTA]: A,
 			[rhit.FB_KEY_POINTB]: B,
+			[rhit.FB_KEY_BUDDY_NAME]: buddy,
 			[rhit.FB_KEY_LAST_TOUCHED]: firebase.firestore.Timestamp.now()
 		});
 	}
 }
 
 rhit.ConfirmedRoutePageController = class {
-	constructor(uid) {
+	constructor() {
+		rhit.HandleDrawerButtons();
+		rhit.fbConfirmRoutePageManager.beginListening(this.updateMap.bind(this));
+	}
 
+	updateMap() {
+		document.querySelector("#buddyOutput").innerHTML = `<h2 id="buddyOutput">You are walking with ${rhit.fbConfirmRoutePageManager.buddyName}!</h2>
+		<div id="salutations">Stay safe and enjoy your trip!</div>`
+		initMap(rhit.fbConfirmRoutePageManager.pointA, rhit.fbConfirmRoutePageManager.pointB);
 	}
 }
 
-function initMap(pointA, pointB) {
+rhit.Post = class {
+	constructor(pointA, pointB) {
+		this.pointA = pointA;
+		this.pointB = pointB;
+	}
+}
+
+rhit.FbConfirmRoutePageManager = class {
+	constructor(uid) {
+		this._uid = uid;
+		this._documentSnapshots = [];
+		this._ref = firebase.firestore().collection(rhit.FB_ROUTES_COLLECTION);
+		this._unsubscribe = null;
+	}
+
+	beginListening(changeListener) {
+		let query = this._ref.orderBy(rhit.FB_KEY_LAST_TOUCHED, "desc").limit(30);
+		if (this._uid) {
+			query = query.where(rhit.FB_KEY_AUTHOR, "==", this._uid);
+		}
+		this._unsubscribe = query.onSnapshot((querySnapshot) => {
+			this._documentSnapshots = querySnapshot.docs;
+			changeListener();
+		})
+	}
+
+	get pointA() {
+		const mostRecent = this._documentSnapshots[0];
+		return mostRecent.get(rhit.FB_KEY_POINTA);
+	}
+
+	get pointB() {
+		const mostRecent = this._documentSnapshots[0];
+		return mostRecent.get(rhit.FB_KEY_POINTB);
+	}
+
+	get buddyName() {
+		const mostRecent = this._documentSnapshots[0];
+		return mostRecent.get(rhit.FB_KEY_BUDDY_NAME);
+	}
+}
+
+function initMap(pointAGiven, pointBGiven) {
 	var map = new google.maps.Map(document.getElementById('map'), {
 		zoom: 8,
 		center: {
@@ -461,7 +516,7 @@ function initMap(pointA, pointB) {
 
 
 	geocoder.geocode({
-		'address': document.getElementById('addressFrom').value
+		'address': pointAGiven
 	}, function (results, status) {
 		if (status != "OK") return;
 		var location = results[0].geometry.location;
@@ -474,7 +529,7 @@ function initMap(pointA, pointB) {
 			map: map
 		});
 		geocoder.geocode({
-			'address': document.getElementById('addressTo').value
+			'address': pointBGiven
 		}, function (results, status) {
 			if (status != "OK") return;
 			var location = results[0].geometry.location;
@@ -605,7 +660,8 @@ rhit.initializePage = function () {
 	if (document.querySelector("#routeConfirmedPage")) {
 		console.log("You are on the confirmed route page.");
 		const uid = urlParams.get("uid");
-		new rhit.ConfirmedRoutePageController(uid);
+		rhit.fbConfirmRoutePageManager = new rhit.FbConfirmRoutePageManager(uid);
+		new rhit.ConfirmedRoutePageController();
 	}
 }
 
@@ -639,7 +695,6 @@ rhit.HandleDrawerButtons = function () {
 
 rhit.main = function () {
 	console.log("Ready");
-	// initMap();
 	rhit.fbAuthManager = new rhit.FbAuthManager();
 	rhit.fbAuthManager.beginListening(() => {
 		console.log("isSignedIn = ", rhit.fbAuthManager.isSignedIn);

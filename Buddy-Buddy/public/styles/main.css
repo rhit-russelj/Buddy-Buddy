@@ -231,6 +231,14 @@ html {
 
 #routeConfirmedPage h1 {
     margin-top: 75px;
+}
+
+#routeConfirmedPage h1, #routeConfirmedPage h2 {
     font-family: 'Raleway', sans-serif;
     text-align: center;
+    background-color: white;
+}
+
+#routeConfirmedPage #map {
+    margin-top: 0;
 }
