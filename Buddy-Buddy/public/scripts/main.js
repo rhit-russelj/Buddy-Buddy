@@ -50,7 +50,7 @@ rhit.ProfilePageController = class {
 			const name = document.querySelector("#editInputName").value;
 			const location = document.querySelector("#editInputLocation").value;
 			const url = document.querySelector("#editInputURL").value;
-			rhit.fbAccountManager.update(name, location, url);
+			rhit.fbAccountManager.add(name, location, url);
 		});
 	
 		$("#editAccountDialog").on("show.bs.modal", (event) => {
@@ -69,18 +69,45 @@ rhit.ProfilePageController = class {
 	}
 	updateView() {
 		const newList = htmlToElement('<div id="accountPage"></div>');
+		const mq = rhit.fbAccountManager.getAccount();
+		const newCard = this._createCard(mq);
+		newList.appendChild(newCard);
 
-		
+		const oldList = document.querySelector("#accountPage");
+		oldList.removeAttribute("id");
+		oldList.hidden = true;
+		oldList.parentElement.appendChild(newList);
+
 		document.querySelector("#accountUrl").innerHTML = `<img class="img-fluid card-img-top" style="margin: 20px; max-height: 375px;" src="${rhit.fbAccountManager.url}">`;
 		document.querySelector("#accountName").innerHTML = rhit.fbAccountManager.name;
 		document.querySelector("#accountEmail").innerHTML = rhit.fbAccountManager.email;
 		document.querySelector("#accountSLocation").innerHTML = rhit.fbAccountManager.url;
 	}
+	_createCard(account) {
+		return htmlToElement(`<div class="card mx-auto profile-style">
+		<div class="card-body">
+			<div id="accountUrl"><img style="margin: 20px; max-height: 375px;" class="card-img-top"
+	  src="${account.url}"
+	  alt="Your profile picture"></div>
+			<h4 id="${account.name}"></h4>
+			<p id="${account.id}@rose-hulman.edu" class="card-text"></p>
+			<p id="${account.location}" class="card-text"></p>
+		</div>
+	</div>`);
+	}
+
+}
+
+rhit.Account = class {
+	constructor(name, location, url){
+		this.name = name;
+		this.url = url;
+		this.location = location;
+	}
 }
 
 rhit.FbAccountManager = class {
 	constructor(uid) {
-		this.add()
 		rhit.HandleDrawerButtons();
 		this._documentSnapshot = {};
 		this._unsubscribe = null;
@@ -103,8 +130,8 @@ rhit.FbAccountManager = class {
 		this._unsubscribe();
 	}
 
-	update(name, location, url) {
-		this._ref.update({
+	add(name, location, url) {
+		this._ref.add({
 			[rhit.FB_KEY_NAME]: name,
 			[rhit.FB_KEY_AUTHOR]: rhit.fbAuthManager.uid,
 			[rhit.FB_KEY_LOCATION]: location,
@@ -116,6 +143,15 @@ rhit.FbAccountManager = class {
 		.catch(function (error) {
 			console.error("Error updating document: ", error);
 		});
+	}
+
+	getAccount() {
+		const docSnapshot = this._documentSnapshots[index];
+		const mq = new rhit.Account(docSnapshot.id,
+			docSnapshot.get(rhit.FB_KEY_NAME),
+			docSnapshot.get(rhit.FB_KEY_URL),
+			docSnapshot.get(rhit.FB_KEY_LOCATION));
+		return mq;
 	}
 
 	get name() {
