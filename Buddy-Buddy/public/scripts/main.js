@@ -26,6 +26,7 @@ rhit.fbAuthManager = null;
 rhit.fbForumManager = null;
 rhit.fbSinglePostManager = null;
 rhit.fbAccountManager = null;
+rhit.fbSingleAccountManager = null;
 rhit.fbRoutesManager = null;
 rhit.fbConfirmRoutePageManager = null;
 
@@ -35,243 +36,238 @@ function htmlToElement(html) {
 	html = html.trim();
 	template.innerHTML = html;
 	return template.content.firstChild;
+
 }
 
-// rhit.ProfilePageController = class {
-// 	constructor(){
-// 		document.querySelector("#submitEditAccount").addEventListener("click", (event) => {
-// 			const name = document.querySelector("#editInputName").value;
-// 			const location = document.querySelector("#editInputLocation").value;
-// 			const url = document.querySelector("#editInputURL").value;
-// 			rhit.fbAccountManager.add(name, location, url);
-// 		});
-	
-// 		$("#editAccountDialog").on("show.bs.modal", (event) => {
-// 			// Pre animation
-// 			document.querySelector("#editInputName").value = rhit.fbAccountManager.name;
-// 			document.querySelector("#editInputLocation").value = rhit.fbAccountManager.location;
-// 			document.querySelector("#editInputURL").value = rhit.fbAccountManager.url;
-// 		});
-// 		$("#editAccountDialog").on("shown.bs.modal", (event) => {
-// 			// Post animation
-// 			document.querySelector("#editInputName").focus();
-// 		});
+rhit.ProfilePageController = class{
+	constructor(){
+		rhit.HandleDrawerButtons();
 
-// 		rhit.fbAccountManager.beginListening(this.updateView.bind(this));
+		document.querySelector("#submitEditAccount").addEventListener("click", (event) => {
+			const name = document.querySelector("#editInputName").value;
+			const location = document.querySelector("#editInputLocation").value;
+			const url = document.querySelector("#editInputURL").value;
+			rhit.fbAccountManager.add(name, location, url);
+		});
 
-// 	}
-// 	updateView() {
-// 		const newList = htmlToElement('<div id="accountPage"></div>');
-// 		const mq = rhit.fbAccountManager.getAccount();
-// 		const newCard = this._createCard(mq);
-// 		newList.appendChild(newCard);
+		$("#editAccountDialog").on("show.bs.modal", (event) => {
+			// Pre animation
+			document.querySelector("#editInputName").value = "";
+			document.querySelector("#editInputLocation").value = "";
+			document.querySelector("#editInputURL").value = "";
+		});
+		$("#editAccountDialog").on("shown.bs.modal", (event) => {
+			// Post animation
+			document.querySelector("#editInputName").focus();
+		});
 
-// 		const oldList = document.querySelector("#accountPage");
-// 		oldList.removeAttribute("id");
-// 		oldList.hidden = true;
-// 		oldList.parentElement.appendChild(newList);
+		// Start listening!
+		rhit.fbAccountManager.beginListening(this.updateList.bind(this));
+	}
 
-// 		document.querySelector("#accountUrl").innerHTML = `<img class="img-fluid card-img-top" style="margin: 20px; max-height: 375px;" src="${rhit.fbAccountManager.url}">`;
-// 		document.querySelector("#accountName").innerHTML = rhit.fbAccountManager.name;
-// 		document.querySelector("#accountEmail").innerHTML = rhit.fbAccountManager.email;
-// 		document.querySelector("#accountSLocation").innerHTML = rhit.fbAccountManager.url;
-// 	}
-// 	_createCard(account) {
-// 		return htmlToElement(`<div class="card mx-auto profile-style">
-// 		<div class="card-body">
-// 			<div id="accountUrl"><img style="margin: 20px; max-height: 375px;" class="card-img-top"
-// 	  src="${account.url}"
-// 	  alt="Your profile picture"></div>
-// 			<h4 id="${account.name}"></h4>
-// 			<p id="${account.id}@rose-hulman.edu" class="card-text"></p>
-// 			<p id="${account.location}" class="card-text"></p>
-// 		</div>
-// 	</div>`);
-// 	}
+	updateList() {
+		const newList = htmlToElement('<div id="accountContainer"></div>');
+		for (let i = 0; i < rhit.fbAccountManager.length; i++) {
+			const mq = rhit.fbAccountManager.getAccountAtIndex(i);
+			const newCard = this._createCard(mq);
+			newCard.onclick = (event) => {
+				window.location.href = `/ProfileDetail.html?id=${mq.id}`;
+			};
+			newList.appendChild(newCard);
+		}
 
-// }
 
-// rhit.Account = class {
-// 	constructor(name, location, url){
-// 		this.name = name;
-// 		this.url = url;
-// 		this.location = location;
-// 	}
-// }
+		// Remove the old photoListContainer
+		const oldList = document.querySelector("#accountContainer");
+		oldList.removeAttribute("id");
+		oldList.hidden = true;
+		// Put in the new photoListContainer
+		oldList.parentElement.appendChild(newList);
+	}
 
-// rhit.FbAccountManager = class {
-// 	constructor(uid) {
-// 		rhit.HandleDrawerButtons();
-// 		this._documentSnapshot = {};
-// 		this._unsubscribe = null;
-// 		this._ref = firebase.firestore().collection(rhit.FB_USERS_COLLECTION).doc(uid);
-// 	}
+	_createCard(account) {
+		return htmlToElement(`<div class="card mx-auto profile-style" id=${account.id}>
+          <div class="card-body">
+              <div id="accountUrl"><img style="margin: 20px; max-height: 375px;" class="card-img-top"
+        src="${account.url}"
+        alt="Your profile picture"></div>
+              <h4 id="${account.name}">Name: ${account.name}</h4>
+              <p id="${rhit.fbAuthManager.uid}" class="card-text">Rose Email: ${rhit.fbAuthManager.uid}@rose-hulman.edu</p>
+              <p id="${account.location}" class="card-text">Starting Location: ${account.location}</p>
+          </div>
+      </div>`);
+	}
 
-// 	beginListening(changeListener) {
-// 		this._unsubscribe = this._ref.onSnapshot((doc) => {
-// 			if (doc.exists) {
-// 				console.log("Document data:", doc.data());
-// 				this._documentSnapshot = doc;
-// 				changeListener();
-// 			} else {
-// 				console.log("No such document!");
-// 			}
-// 		});
-// 	}
+}
 
-// 	stopListening() {
-// 		this._unsubscribe();
-// 	}
+rhit.Account = class {
+	constructor(id, name, location, url) {
+		this.id = id;
+		this.name = name;
+		this.location = location;
+		this.url = url;
+	}
+}
 
-// 	add(name, location, url) {
-// 		this._ref.add({
-// 			[rhit.FB_KEY_NAME]: name,
-// 			[rhit.FB_KEY_AUTHOR]: rhit.fbAuthManager.uid,
-// 			[rhit.FB_KEY_LOCATION]: location,
-// 			[rhit.FB_KEY_URL]: url,
-// 		})
-// 		.then(() => {
-// 			console.log("Document successfully updated!");
-// 		})
-// 		.catch(function (error) {
-// 			console.error("Error updating document: ", error);
-// 		});
-// 	}
+rhit.FbAccountManager = class {
+	constructor() {
+		this._documentSnapshots = [];
+		this._ref = firebase.firestore().collection(rhit.FB_USERS_COLLECTION);
+		this._unsubscribe = null;
+	}
 
-// 	getAccount() {
-// 		const docSnapshot = this._documentSnapshots[index];
-// 		const mq = new rhit.Account(docSnapshot.id,
-// 			docSnapshot.get(rhit.FB_KEY_NAME),
-// 			docSnapshot.get(rhit.FB_KEY_URL),
-// 			docSnapshot.get(rhit.FB_KEY_LOCATION));
-// 		return mq;
-// 	}
+	add(name, location, url) {
+		// Add a new document with a generated id.
+		this._ref.add({
+				[rhit.FB_KEY_NAME]: name,
+				[rhit.FB_KEY_LOCATION]: location,
+				[rhit.FB_KEY_URL]: url,
+				[rhit.FB_KEY_LAST_TOUCHED]: firebase.firestore.Timestamp.now(),
+			})
+			.then(function (docRef) {
+				console.log("Document written with ID: ", docRef.id);
+			})
+			.catch(function (error) {
+				console.error("Error adding document: ", error);
+			});
+	}
 
-// 	get name() {
-// 		return this._documentSnapshot.get(rhit.FB_KEY_NAME);
-// 	}
+	beginListening(changeListener) {
+		let query = this._ref.orderBy(rhit.FB_KEY_LAST_TOUCHED, "desc").limit(50);
 
-// 	get location() {
-// 		return this._documentSnapshot.get(rhit.FB_KEY_LOCATION);
-// 	}
+		if (this._uid) {
+			query = query.where(rhit.FB_KEY_AUTHOR, "==", this._uid);}
 
-// 	get url() {
-// 		return this._documentSnapshot.get(rhit.FB_KEY_URL);
-// 	}
-// }
-// 		$("#editAccountDialog").on("show.bs.modal", (event) => {
-// 			// Pre animation
-// 			document.querySelector("#editInputName").value = rhit.fbAccountManager.name;
-// 			document.querySelector("#editInputLocation").value = rhit.fbAccountManager.location;
-// 			document.querySelector("#editInputURL").value = rhit.fbAccountManager.url;
-// 		});
-// 		$("#editAccountDialog").on("shown.bs.modal", (event) => {
-// 			// Post animation
-// 			document.querySelector("#editInputName").focus();
-// 		});
+		this._unsubscribe = query.onSnapshot((querySnapshot) => {
+				this._documentSnapshots = querySnapshot.docs;
+				changeListener();
+			});
+	}
 
-// 		rhit.fbAccountManager.beginListening(this.updateView.bind(this));
+	stopListening() {
+		this._unsubscribe();
+	}
 
-// 	}
-// 	updateView() {
-// 		const newList = htmlToElement('<div id="accountPage"></div>');
-// 		const mq = rhit.fbAccountManager.getAccount();
-// 		const newCard = this._createCard(mq);
-// 		newList.appendChild(newCard);
+	get length() {
+		return this._documentSnapshots.length;
+	}
 
-// 		const oldList = document.querySelector("#accountPage");
-// 		oldList.removeAttribute("id");
-// 		oldList.hidden = true;
-// 		oldList.parentElement.appendChild(newList);
+	getAccountAtIndex(index) {
+		const docSnapshot = this._documentSnapshots[index];
+		const mq = new rhit.Account(docSnapshot.id,
+			docSnapshot.get(rhit.FB_KEY_NAME),
+			docSnapshot.get(rhit.FB_KEY_LOCATION),
+			docSnapshot.get(rhit.FB_KEY_URL));
+		return mq;
+	}
+}
 
-// 		document.querySelector("#accountUrl").innerHTML = `<img class="img-fluid card-img-top" style="margin: 20px; max-height: 375px;" src="${rhit.fbAccountManager.url}">`;
-// 		document.querySelector("#accountName").innerHTML = rhit.fbAccountManager.name;
-// 		document.querySelector("#accountEmail").innerHTML = rhit.fbAccountManager.email;
-// 		document.querySelector("#accountSLocation").innerHTML = rhit.fbAccountManager.url;
-// 	}
-// 	_createCard(account) {
-// 		return htmlToElement(`<div class="card mx-auto profile-style">
-// 		<div class="card-body">
-// 			<div id="accountUrl"><img style="margin: 20px; max-height: 375px;" class="card-img-top"
-// 	  src="${account.url}"
-// 	  alt="Your profile picture"></div>
-// 			<h4 id="${account.name}"></h4>
-// 			<p id="${account.id}@rose-hulman.edu" class="card-text"></p>
-// 			<p id="${account.location}" class="card-text"></p>
-// 		</div>
-// 	</div>`);
-// 	}
 
-// }
+rhit.AccountDetailPageController = class {
+	constructor() {
 
-// rhit.Account = class {
-// 	constructor(name, location, url){
-// 		this.name = name;
-// 		this.url = url;
-// 		this.location = location;
-// 	}
-// }
+		document.querySelector("#submitEditProfile").addEventListener("click", (event) => {
+			const name = document.querySelector("#inputName").value;
+			const location = document.querySelector("#inputLocation").value;
+			const url = document.querySelector("#inputUrl").value;
+			rhit.fbSingleAccountManager.update(name, location, url);
+		});
 
-// rhit.FbAccountManager = class {
-// 	constructor(uid) {
-// 		rhit.HandleDrawerButtons();
-// 		this._documentSnapshot = {};
-// 		this._unsubscribe = null;
-// 		this._ref = firebase.firestore().collection(rhit.FB_USERS_COLLECTION.doc(uid));
-// 	}
+		$("#editProfileDialog").on("show.bs.modal", (event) => {
+			// Pre animation
+			document.querySelector("#inputName").value = rhit.fbSingleAccountManager.name;
+			document.querySelector("#inputLocation").value = rhit.fbSingleAccountManager.location;
+			document.querySelector("#inputUrl").value = rhit.fbSingleAccountManager.url;
+		});
+		$("#editProfileDialog").on("shown.bs.modal", (event) => {
+			// Post animation
+			document.querySelector("#inputName").focus();
+		});
 
-// 	beginListening(changeListener) {
-// 		this._unsubscribe = this._ref.onSnapshot((doc) => {
-// 			if (doc.exists) {
-// 				console.log("Document data:", doc.data());
-// 				this._documentSnapshot = doc;
-// 				changeListener();
-// 			} else {
-// 				console.log("No such document!");
-// 			}
-// 		});
-// 	}
+		document.querySelector("#submitDeleteProfile").addEventListener("click", event => {
+			rhit.fbSingleAccountManager.delete().then(() => {
+				console.log("Document successfully deleted!");
+				window.location.href = "/Profile.html";
+			}).catch(error => console.error("Error removing document: ", error));
+		});
 
-// 	stopListening() {
-// 		this._unsubscribe();
-// 	}
+		document.querySelector("#profileGoBackButton").addEventListener("click", event => {
+			window.location.href = "/Profile.html";
+		})
 
-// 	add(name, location, url) {
-// 		this._ref.add({
-// 			[rhit.FB_KEY_NAME]: name,
-// 			[rhit.FB_KEY_AUTHOR]: rhit.fbAuthManager.uid,
-// 			[rhit.FB_KEY_LOCATION]: location,
-// 			[rhit.FB_KEY_URL]: url,
-// 		})
-// 		.then(() => {
-// 			console.log("Document successfully updated!");
-// 		})
-// 		.catch(function (error) {
-// 			console.error("Error updating document: ", error);
-// 		});
-// 	}
+		rhit.fbSingleAccountManager.beginListening(this.updateView.bind(this));
+	}
 
-// 	getAccount() {
-// 		const docSnapshot = this._documentSnapshots[index];
-// 		const mq = new rhit.Account(docSnapshot.id,
-// 			docSnapshot.get(rhit.FB_KEY_NAME),
-// 			docSnapshot.get(rhit.FB_KEY_URL),
-// 			docSnapshot.get(rhit.FB_KEY_LOCATION));
-// 		return mq;
-// 	}
+	updateView() {
+		document.querySelector("#cardUrl").innerHTML = `<img style="margin: 20px; max-height: 375px;" class="card-img-top"
+		src="${rhit.fbSingleAccountManager.url}"
+		alt="Your profile picture">`;
+		document.querySelector("#cardName").innerHTML = `Name: ${rhit.fbSingleAccountManager.name}`;
+		document.querySelector("#cardEmail").innerHTML = `Rose Email: ${rhit.fbAuthManager.uid}@rose-hulman.edu`;
+		document.querySelector("#cardLocation").innerHTML = `Starting Location: ${rhit.fbSingleAccountManager.location}`;
+		document.querySelector("#menuEdit").style.display = "flex";
+		document.querySelector("#menuDelete").style.display = "flex";
+	}
+}
 
-// 	get name() {
-// 		return this._documentSnapshot.get(rhit.FB_KEY_NAME);
-// 	}
+rhit.FbSingleAccountManager = class {
+	constructor(accountId) {
+		rhit.HandleDrawerButtons();
+		this._documentSnapshot = {};
+		this._unsubscribe = null;
+		this._ref = firebase.firestore().collection(rhit.FB_USERS_COLLECTION).doc(accountId);
+	}
 
-// 	get location() {
-// 		return this._documentSnapshot.get(rhit.FB_KEY_LOCATION);
-// 	}
+	beginListening(changeListener) {
+		this._unsubscribe = this._ref.onSnapshot((doc) => {
+			if (doc.exists) {
+				console.log("Document data:", doc.data());
+				this._documentSnapshot = doc;
+				changeListener();
+			} else {
+				// doc.data() will be undefined in this case
+				console.log("No such document!");
+				//window.location.href = "/";
+			}
+		});
+	}
 
-// 	get url() {
-// 		return this._documentSnapshot.get(rhit.FB_KEY_URL);
-// 	}
-// }
+	stopListening() {
+		this._unsubscribe();
+	}
+
+	update(name, location, url) {
+		this._ref.update({
+			[rhit.FB_KEY_NAME]: name,
+			[rhit.FB_KEY_LOCATION]: location,
+			[rhit.FB_KEY_URL]: url,
+			[rhit.FB_KEY_LAST_TOUCHED]: firebase.firestore.Timestamp.now(),
+		})
+			.then(() => {
+				console.log("Document successfully updated!");
+			})
+			.catch(function (error) {
+				// The document probably doesn't exist.
+				console.error("Error updating document: ", error);
+			});
+	}
+
+	delete() {
+		return this._ref.delete();
+	}
+
+	get name() {
+		return this._documentSnapshot.get(rhit.FB_KEY_NAME);
+	}
+
+	get location() {
+		return this._documentSnapshot.get(rhit.FB_KEY_LOCATION);
+	}
+
+	get url() {
+		return this._documentSnapshot.get(rhit.FB_KEY_URL);
+	}
+}
 
 
 rhit.ForumListController = class {
@@ -681,12 +677,6 @@ function initMap(pointAGiven, pointBGiven) {
 	});
 }
 
-// rhit.AccountPageController = class {
-// 	constructor() {
-// 		rhit.HandleDrawerButtons();
-// 	}
-// }
-
 rhit.FbAuthManager = class {
 	constructor() {
 		this._user = null;
@@ -777,8 +767,19 @@ rhit.initializePage = function () {
 	}
 	if (document.querySelector("#accountPage")) {
 		console.log("You are on the profile page.");
-		rhit.ProfilePageController = new rhit.FbAccountManager(rhit.fbAuthManager.uid);
-		new rhit.FbAccountManager();
+
+		const uid = urlParams.get("uid");
+		rhit.fbAccountManager = new rhit.FbAccountManager(uid);
+		new rhit.ProfilePageController();
+	}
+	if (document.querySelector("#accountDetailPage")) {
+		console.log("You are on the account detail page.");
+		const accountId = urlParams.get("id");
+		if (!accountId) {
+			window.location.href = "/";
+		}
+		rhit.fbSingleAccountManager = new rhit.FbSingleAccountManager(accountId);
+		new rhit.AccountDetailPageController();
 	}
 	if (document.querySelector("#findRoutePage")) {
 		console.log("You are on the find route page.");

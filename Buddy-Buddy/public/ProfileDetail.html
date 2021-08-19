@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/main.css">
-  <title>Account Profile</title>
+  <title>Edit Profile</title>
 </head>
 
 <body>
@@ -24,9 +24,27 @@
           <i class="material-icons">menu</i>
         </button>
         <a id="homePageLink" class="navbar-brand" href="Homepage.html"
-          style="font-family: Lobster; text-align: center; margin-left:25px">My Account</a>
+          style="font-family: Lobster; text-align: center; margin-left:25px">Edit Profile</a>
       </div>
     </header>
+    <div id="profileDropdownToggle" class="dropdown pull-xs-right" >
+      <button style="top: 20px; left: 70px;" class="btn bmd-btn-icon dropdown-toggle" type="button" id="lr1" data-toggle="dropdown"
+        aria-haspopup="true" aria-expanded="false">
+        <i class="material-icons">more_vert</i>
+      </button>
+      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="lr1">
+        <button id="menuEdit" class="dropdown-item" type="button" data-toggle="modal" data-target="#editProfileDialog">
+          <i class="material-icons">edit</i>&nbsp;&nbsp;&nbsp;Edit
+        </button>
+        <button id="menuDelete" class="dropdown-item" type="button" data-toggle="modal"
+          data-target="#deleteProfileDialogue"><i class="material-icons">delete</i>&nbsp;&nbsp;&nbsp;Delete</button>
+        <button id="menuSignOut" class="dropdown-item" type="button"><i
+            class="material-icons">login</i>&nbsp;&nbsp;&nbsp;Sign Out</button>
+      </div>
+    </div>
+
+    <button id="profileGoBackButton" type="button" class="btn">Go Back to Profile</button>
+
     <div id="dw-s2" class="bmd-layout-drawer bg-faded">
       <header>
         <a class="navbar-brand" style="font-family: 'Lobster', cursive; font-style: normal;">Buddy Buddy</a>
@@ -41,42 +59,64 @@
       </ul>
     </div>
     <main class="bmd-layout-content">
-        
-        <div id="accountPage" class="container page-container">
-          <div id="accountContainer"></div>
+      <div id="accountDetailPage">
+        <div class="card mx-auto profile-style" style="top:70px">
+            <div class="card-body">
+                <div id="cardUrl"></div>
+                <h4 id="cardName"></h4>
+                <p id="cardEmail" class="card-text">Loading...</p>
+                <p id="cardLocation" class="card-text"></p>
+            </div>
         </div>
-        
-      </main>
-      <button style="left: 37%;" type="button" id="editAccountButton" class="btn" data-toggle="modal"
-        data-target="#editAccountDialog">Create Account</button>
+        </div>
+      </div>
+    </main>
   </div>
 
   <!-- Modals -->
-  <div class="modal fade" id="editAccountDialog" tabindex="-1" role="dialog" aria-labelledby="Edit Account dialog"
+  <div class="modal fade" id="editProfileDialog" tabindex="-1" role="dialog" aria-labelledby="Edit Post dialog"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Edit Account Info</h5>
+          <h5 class="modal-title">Edit Forum Post</h5>
         </div>
         <div class="modal-body">
           <div class="form-group bmd-form-group">
-            <label for="editInputName">Member Name</label>
-            <input type="text" class="form-control" id="editInputName" placeholder=" ">
+            <label for="inputName">Post Title</label>
+            <input type="text" class="form-control" id="inputName" placeholder=" ">
           </div>
           <div class="form-group bmd-form-group">
-            <label for="editInputLocation">Starting Location</label>
-            <input type="text" class="form-control" id="editInputLocation" placeholder=" ">
-            <span class="bmd-help">Where would you like to meet others to start walking from?</span>
+            <label for="inputLocation">Post Body</label>
+            <input type="text" class="form-control" id="inputLocation" placeholder=" ">
           </div>
           <div class="form-group bmd-form-group">
-            <label for="editInputURL" class="bmd-label-floating">Profile Image Url</label>
-            <input type="text" class="form-control" id="editInputURL">
+            <label for="inputUrl">Post Title</label>
+            <input type="text" class="form-control" id="inputUrl" placeholder=" ">
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
-          <button id="submitEditAccount" type="button" class="btn btn-primary" data-dismiss="modal">SAVE</button>
+          <button id="submitEditProfile" type="button" class="btn btn-primary" data-dismiss="modal">SAVE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="deleteProfileDialogue" tabindex="-1" role="dialog" aria-labelledby="Delete profile dialog"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Delete your current Account?</h5>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete your current account information?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
+          <button id="submitDeleteProfile" type="button" class="btn btn-primary" data-dismiss="modal">DELETE</button>
         </div>
       </div>
     </div>
