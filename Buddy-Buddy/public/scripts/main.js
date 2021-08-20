@@ -188,7 +188,7 @@ rhit.AccountDetailPageController = class {
 		document.querySelector("#submitDeleteProfile").addEventListener("click", event => {
 			rhit.fbSingleAccountManager.delete().then(() => {
 				console.log("Document successfully deleted!");
-				document.getElementById("editAccountButton").disabled = false;
+				document.querySelector("#editAccountButton").disabled = false;
 				window.location.href = "/Profile.html";
 			}).catch(error => console.error("Error removing document: ", error));
 		});
