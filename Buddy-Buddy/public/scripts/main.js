@@ -70,10 +70,11 @@ rhit.ProfilePageController = class{
 		for (let i = 0; i < rhit.fbAccountManager.length; i++) {
 			const mq = rhit.fbAccountManager.getAccountAtIndex(i);
 			const newCard = this._createCard(mq);
+			document.getElementById("editAccountButton").disabled = true;
 			newCard.onclick = (event) => {
 				window.location.href = `/ProfileDetail.html?id=${mq.id}`;
 			};
-			newList.appendChild(newCard);
+			newList.appendChild(newCard);				
 		}
 
 
@@ -187,6 +188,7 @@ rhit.AccountDetailPageController = class {
 		document.querySelector("#submitDeleteProfile").addEventListener("click", event => {
 			rhit.fbSingleAccountManager.delete().then(() => {
 				console.log("Document successfully deleted!");
+				document.getElementById("editAccountButton").disabled = false;
 				window.location.href = "/Profile.html";
 			}).catch(error => console.error("Error removing document: ", error));
 		});
